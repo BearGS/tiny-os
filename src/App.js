@@ -2,7 +2,7 @@ export default class App {
   constructor () {
     if (typeof App.instance === 'object'
       && App.instance instanceof App) {
-      return App.instance;
+      return App.instance
     }
     Object.defineProperty(App, 'instance', {
       value: this,

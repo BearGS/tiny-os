@@ -5,7 +5,7 @@ import {
   TOS_RESPONSE_PACKET_TYPE
 } from './tosSymbols'
 import { ProcedureType, ModuleType } from './constants'
-import invariant from './utils/invariant';
+import invariant from './utils/invariant'
 
 class Packet {
   /**
