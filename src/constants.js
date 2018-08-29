@@ -5,6 +5,7 @@ export const ProcedureType = 'string'
 export const MAX_APP = 5
 
 export const AppState = {
+  UNREGISTER: 'unregister',
   UNLOAD: 'unload',
   BACKEND: 'backend',
   FRONTEND: 'frontend',

@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import Router from './Router'
+// import Router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
 import { AppState, MAX_APP, AppPriority } from './constants'
@@ -30,38 +30,50 @@ export default class AppManager {
       writable: false,
     })
 
-    this.router = new Router()
+    // this.router = new Router()
   }
 
-  launch = appName => 
+  launch = appName => {
+    invariant(
+      !this.getApp(appName),
+      `No such App named \`${appName}\``,
+    )
+
     this
+      .suspendOpendApp()
       .load(appName)
       .open(appName)
-      .suspendOpendApp()
       .killOverflowApp()
+  }
 
-  register = ({ name, url, priority = AppPriority.TEMPORARY }) => {
+  register = ({ 
+    name, 
+    url, 
+    priority = AppPriority.TEMPORARY 
+  } = {}) => {
     invariant(
       !name || typeof name !== 'string',
-      `Invalid params name: \`${name}\``,
+      `Invalid params name`,
     )
 
     invariant(
       !url || typeof url !== 'string',
-      `Invalid params url: \`${url}\``,
+      `Invalid params url`,
     )    
     
     invariant(
-      this._apps.find(app => app.name === name),
+      this.getApp(name),
       `you've already register another app named \`${name}\``,
     )
 
     const registeringApp = { name, url, priority }
     this._apps.unshift(registeringApp)
-    setBackend(registeringApp)
+    setUnload(registeringApp)
 
     return this
   }
+
+  registerAll = apps => apps.forEach(app => this.register(app))
 
   load = appName => {
     const loadingApp = this.getApp(appName)
@@ -118,4 +130,8 @@ export default class AppManager {
 
   getApp = name => this._apps.find(app => app.name === name)
   getApps = () => this._apps
+
+  getBackendApps = () => this._apps.filter(app => app.state === AppState.BACKEND)
+  getFrontendApps = () => this._apps.filter(app => app.state === AppState.FRONTEND)
+  getUnloadApps = () => this._apps.filter(app => app.state === AppState.UNLOAD)
 }

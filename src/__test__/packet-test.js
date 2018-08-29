@@ -1,4 +1,5 @@
-const { RequestPacket } = require('../packet')
+// const { RequestPacket } = require('../packet')
+import { RequestPacket } from '../packet'
 
 describe('packet', () => {
   it('throws if the first item is null or undefined', () => {
