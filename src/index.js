@@ -1,3 +1,3 @@
-export { TApp } from './App'
-export { THost } from './Host'
+// export { TApp } from './App'
+export { default as Host } from './Host'
 

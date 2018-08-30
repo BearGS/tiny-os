@@ -17,21 +17,11 @@ export default class Host {
     })
   }
 
-  configContainer (container) {
-    router.configContainer(container)
-  }
-
-  registerApp (app) {
-    appManager.register(app)
-  }
-
-  registerAll (apps) {
-    appManager.registerAll(apps)
-  }
-
-  launchApp (app) {
-    appManager.launch(app)
-  }
+  launchApp = app => appManager.launch(app)
+  registerApp = app => appManager.register(app)
+  registerAll = apps => appManager.registerAll(apps)
+  configContainer = container => router.configContainer(container)
+  getApps = () => appManager.getApps()
 
   use = (module, ...options) => {
     if (module.installed) {
@@ -39,6 +29,7 @@ export default class Host {
     }
     module.install(this.modules, options)
     module.installed = true
+    
     return this // eslint-disable-line
   }
 

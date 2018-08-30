@@ -15,7 +15,7 @@ export function createIframe(container, name, uri) {
   iframe.style.display = 'none'
   container.appendChild(iframe)
 
-  return { name, iframe }
+  return iframe
 }
 
 export function hideIframe(iframe) {

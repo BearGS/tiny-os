@@ -19,7 +19,12 @@ function setUnload (app) {
 }
 function updateRouter (app) {
   router.updateRouterMap(_apps)
-  app && router.goRouter(app) // eslint-disable-line
+  if (app) {
+    router.render(app)
+    if (app.handler === OsHandler.OPEN) {
+      router.goRouter(app)
+    }
+  }
 }
 
 class AppManager {
@@ -35,15 +40,6 @@ class AppManager {
     })
 
     router.history.listen(this.onOuterAppChange.bind(this))
-  }
-
-  launch = appName => {
-    const app = this.getApp(appName)
-    this
-      .suspendOpendApp()
-      .load(app)
-      .open(app)
-      .killOverflowApp()
   }
 
   register = ({ 
@@ -77,15 +73,26 @@ class AppManager {
   }
 
   // outer hash change, for example, directly click a Tag with hash
-  onOuterAppChange = ({ hash, handler }) => {
+  onOuterAppChange = ({ hash = '' }) => {
+    debugger // eslint-disable-line
+    if (!hash) return
     const appName = hash.slice(1)
-    const app = this.getApp(appName)
-
-    if (!handler) {
-      this
-        .load(app)
-        .open(app)
+    const app = this.getApp(appName, true)
+    if (app) {
+      this.launch(app.name)
+    } else {
+      debugger // eslint-disable-line
+      window.location.hash = hash
     }
+  }
+
+  launch = appName => {
+    const app = this.getApp(appName)
+    this
+      .suspendOpendApp()
+      .load(app)
+      .open(app)
+      .killOverflowApp()
   }
 
   load = loadingApp => {
@@ -128,10 +135,9 @@ class AppManager {
   killOverflowApp = () => {
     const backendApp = _apps
       .filter(app => app.state === AppState.BACKEND)
-
     if (backendApp.length >= MAX_APP) {
       const killedApp = backendApp.pop()
-      setUnload(killedApp)
+      this.kill(killedApp)
     }
 
     return this
@@ -144,7 +150,7 @@ class AppManager {
     invariant(
       !flag && !App,
       `No such App named \`${appName}\``,
-    )
+    ) 
 
     return App
   }
@@ -154,3 +160,5 @@ class AppManager {
 }
 
 export default new AppManager()
+
+

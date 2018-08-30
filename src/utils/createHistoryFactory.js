@@ -1,6 +1,5 @@
 /* eslint-disable no-use-before-define */
 
-
 // createRouterManager.js
 const createRouterManager = () => {
   let listeners =  []
@@ -33,8 +32,13 @@ export default function createHistoryFactory (originHistory) {
     routeManager.notify({ path, state, hash, handler })
   }
 
-  const handlePopState = () => setState()
-  const handleHashChange = () => setState()
+  const handlePopState = () => {
+    // setState()
+  }
+  const handleHashChange = () => {
+    console.log('hashchange')
+    setState()
+  }
   window.addEventListener(PopStateEvent, handlePopState)
   window.addEventListener(HashChangeEvent, handleHashChange)
 
@@ -49,9 +53,11 @@ export default function createHistoryFactory (originHistory) {
     originHistory.replaceState(state, '', path)
     setState({ handler })
   }
-  const setHash = (hash, handler) => {
-    history.location.hash = hash
-    setState({ handler })
+  const setHash = ({ hash, handler }) => {
+    if (history.location.hash !== `#${hash}`) {
+      originHistory.pushState(null, null, `#${hash}`)
+      setState({ handler })
+    }
   }
 
   const history =  {
