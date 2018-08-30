@@ -11,12 +11,9 @@ export default class App {
     })
   }
 
-  invoke = () => {
-    return new Promise()
-  }
+  invoke = () => new Promise()
 
   onRegister = () => {
-    
   }
 
   onLoad = () => {
@@ -24,11 +21,11 @@ export default class App {
   }
 
   onUnload = () => {
-    
+
   }
 
   onOpen = () => {
-    
+
   }
 
   onUnopen = () => {
@@ -36,10 +33,10 @@ export default class App {
   }
 
   onSuspend = () => {
-    
+
   }
 
   onKill = () => {
-    
+
   }
 }

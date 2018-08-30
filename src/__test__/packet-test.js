@@ -1,4 +1,3 @@
-// const { RequestPacket } = require('../packet')
 import { RequestPacket } from '../packet'
 
 describe('packet', () => {

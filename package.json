@@ -5,10 +5,12 @@
   "main": "dist/tiny-os.umd.min.js",
   "module": "dist/tiny-os.esm.js",
   "scripts": {
+    "test": "NODE_ENV=test jest",
     "build": "NODE_ENV=production node scripts/rollup/index.js",
     "start": "NODE_ENV=development node scripts/webpack/start.js & node example/server.js",
-    "test": "NODE_ENV=test jest",
-    "lint-staged": "lint-staged"
+    "lint:fix": "eslint --fix .js,.jsx,.ts,.tsx src  --ignore-pattern '!.eslintrc.js'",
+    "lint": "eslint -f 'stylish' --ext .js,.jsx,.ts,.tsx src  --ignore-pattern '!.eslintrc.js'",
+    "lint-staged": "NODE_ENV=production lint-staged"
   },
   "dependencies": {
     "is-plain-object": "^2.0.4",
@@ -76,7 +78,8 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
+      "npm run lint:fix",
+      "jest --bail --findRelatedTests",
       "git add"
     ]
   }

@@ -2,7 +2,7 @@
 
 // createRouterManager.js
 const createRouterManager = () => {
-  let listeners =  []
+  let listeners = []
 
   const notify = (...args) => listeners.forEach(listener => listener(...args))
 
@@ -23,13 +23,15 @@ export default function createHistoryFactory (originHistory) {
   const routeManager = createRouterManager()
   const listen = fn => routeManager.add(fn)
 
-  const setState = ({ 
-    path = history.location.pathname, 
+  const setState = ({
+    path = history.location.pathname,
     state = history.state,
     hash = history.location.hash,
     handler = '',
   } = {}) => {
-    routeManager.notify({ path, state, hash, handler })
+    routeManager.notify({
+      path, state, hash, handler
+    })
   }
 
   const handlePopState = () => {
@@ -59,7 +61,7 @@ export default function createHistoryFactory (originHistory) {
     }
   }
 
-  const history =  {
+  const history = {
     go,
     back,
     forward,
@@ -74,3 +76,4 @@ export default function createHistoryFactory (originHistory) {
 
   return history
 }
+

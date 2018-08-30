@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import router from './Router'
+// import router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
 import { AppState, MAX_APP, AppPriority, OsHandler } from './constants'
@@ -18,13 +18,13 @@ function setUnload (app) {
   app.loadTime = 0
 }
 function updateRouter (app) {
-  router.updateRouterMap(_apps)
-  if (app) {
-    router.render(app)
-    if (app.handler === OsHandler.OPEN) {
-      router.goRouter(app)
-    }
-  }
+  // router.updateRouterMap(_apps)
+  // if (app) {
+  //   router.render(app)
+  //   if (app.handler === OsHandler.OPEN) {
+  //     router.goRouter(app)
+  //   }
+  // }
 }
 
 class AppManager {
@@ -39,24 +39,24 @@ class AppManager {
       writable: false,
     })
 
-    router.history.listen(this.onOuterAppChange.bind(this))
+    // router.history.listen(this.onOuterAppChange.bind(this))
   }
 
-  register = ({ 
-    name, 
-    url, 
-    priority = AppPriority.TEMPORARY 
+  register = ({
+    name,
+    url,
+    priority = AppPriority.TEMPORARY
   } = {}) => {
     invariant(
       !name || typeof name !== 'string',
-      `Invalid params name`,
+      'Invalid params name',
     )
 
     invariant(
       !url || typeof url !== 'string',
-      `Invalid params url`,
-    )    
-    
+      'Invalid params url',
+    )
+
     invariant(
       this.getApp(name, true),
       `you've already register another app named \`${name}\``,
@@ -148,7 +148,7 @@ class AppManager {
     invariant(
       !flag && !App,
       `No such App named \`${appName}\``,
-    ) 
+    )
 
     return App
   }
@@ -158,5 +158,4 @@ class AppManager {
 }
 
 export default new AppManager()
-
 

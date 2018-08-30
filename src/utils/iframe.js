@@ -3,7 +3,7 @@
 //   target.appendChild(iframe)
 // }
 
-export function createIframe(container, name, uri) {
+export function createIframe (container, name, uri) {
   const iframe = document.createElement('iframe')
   iframe.setAttribute('id', name)
   iframe.setAttribute('src', uri)
@@ -18,11 +18,11 @@ export function createIframe(container, name, uri) {
   return iframe
 }
 
-export function hideIframe(iframe) {
+export function hideIframe (iframe) {
   iframe.style.display = 'none'
 }
 
-export function showIframe(iframe) {
+export function showIframe (iframe) {
   iframe.style.display = null
 }
 

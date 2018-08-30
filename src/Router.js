@@ -7,7 +7,6 @@ let currentUrl = ''
 let routerMap = []
 let iframeMap = []
 
-
 function getIframe (app) {
   const iframeApp = iframeMap.find(item => item.name === app.name)
 
@@ -34,7 +33,7 @@ class Router {
   container = window.document.body
 
   constructor (initUrl) {
-    currentUrl = initUrl || window.location.hash || '' 
+    currentUrl = initUrl || window.location.hash || ''
     this.history = createHistoryFactory(window.history)
     // this.unlisten = this.history.listen(this.render.bind(this))
     // currentUrl && this.goRouter({ name: currentUrl }) // eslint-disable-line
@@ -75,7 +74,7 @@ class Router {
   }
 
   loadIframe = ({ name, url }) => {
-    if(!iframeMap.find(iframe => iframe.name === name)) {
+    if (!iframeMap.find(iframe => iframe.name === name)) {
       const iframe = createIframe(this.container, name, url)
       iframeMap.push({ name, iframe })
     }
