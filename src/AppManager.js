@@ -74,14 +74,12 @@ class AppManager {
 
   // outer hash change, for example, directly click a Tag with hash
   onOuterAppChange = ({ hash = '' }) => {
-    debugger // eslint-disable-line
     if (!hash) return
     const appName = hash.slice(1)
     const app = this.getApp(appName, true)
     if (app) {
       this.launch(app.name)
     } else {
-      debugger // eslint-disable-line
       window.location.hash = hash
     }
   }

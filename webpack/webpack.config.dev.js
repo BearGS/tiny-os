@@ -1,6 +1,5 @@
 /* eslint-disable function-paren-newline */
-const path = require('path')
-const paths = require('./paths')
+const paths = require('../config/paths')
 const { Config } = require('webpack-config')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')

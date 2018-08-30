@@ -1,4 +1,8 @@
-const { name, version, author } =  require('./package.json')
+
+/* eslint-disable import/no-dynamic-require */
+const paths = require('../config/paths')
+
+const { name, version, author } =  require(paths.appPackageJson)
 
 const entries = {
   'tiny-os': 'src/index.js',

@@ -17,7 +17,7 @@ const {
   prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils')
 const openBrowser = require('react-dev-utils/openBrowser')
-const paths = require('../../webpack/paths')
+const paths = require('../../config/paths')
 const config = require('../../webpack/webpack.config.dev')
 const createDevServerConfig = require('../../webpack/webpackDevServer.config')
 

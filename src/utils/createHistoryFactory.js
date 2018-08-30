@@ -36,7 +36,6 @@ export default function createHistoryFactory (originHistory) {
     // setState()
   }
   const handleHashChange = () => {
-    console.log('hashchange')
     setState()
   }
   window.addEventListener(PopStateEvent, handlePopState)
