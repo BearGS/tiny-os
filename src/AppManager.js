@@ -1,8 +1,10 @@
 /* eslint-disable no-param-reassign */
-// import Router from './Router'
+import router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { AppState, MAX_APP, AppPriority } from './constants'
+import { AppState, MAX_APP, AppPriority, OsHandler } from './constants'
+
+const _apps = []
 
 function setBackend (app) {
   app.state = AppState.BACKEND
@@ -15,10 +17,12 @@ function setUnload (app) {
   app.state = AppState.UNLOAD
   app.loadTime = 0
 }
+function updateRouter (app) {
+  router.updateRouterMap(_apps)
+  app && router.goRouter(app) // eslint-disable-line
+}
 
-export default class AppManager {
-  _apps = []
-
+class AppManager {
   constructor () {
     if (typeof AppManager.instance === 'object'
       && AppManager.instance instanceof AppManager) {
@@ -30,19 +34,15 @@ export default class AppManager {
       writable: false,
     })
 
-    // this.router = new Router()
+    router.history.listen(this.onOuterAppChange.bind(this))
   }
 
   launch = appName => {
-    invariant(
-      !this.getApp(appName),
-      `No such App named \`${appName}\``,
-    )
-
+    const app = this.getApp(appName)
     this
       .suspendOpendApp()
-      .load(appName)
-      .open(appName)
+      .load(app)
+      .open(app)
       .killOverflowApp()
   }
 
@@ -62,58 +62,71 @@ export default class AppManager {
     )    
     
     invariant(
-      this.getApp(name),
+      this.getApp(name, true),
       `you've already register another app named \`${name}\``,
     )
 
     const registeringApp = { name, url, priority }
-    this._apps.unshift(registeringApp)
+    _apps.unshift(registeringApp)
     setUnload(registeringApp)
-
-    return this
+    updateRouter()
   }
 
-  registerAll = apps => apps.forEach(app => this.register(app))
+  registerAll = apps => {
+    apps.forEach(app => this.register(app))
+  }
 
-  load = appName => {
-    const loadingApp = this.getApp(appName)
+  // outer hash change, for example, directly click a Tag with hash
+  onOuterAppChange = ({ hash, handler }) => {
+    const appName = hash.slice(1)
+    const app = this.getApp(appName)
+
+    if (!handler) {
+      this
+        .load(app)
+        .open(app)
+    }
+  }
+
+  load = loadingApp => {
     setBackend(loadingApp)
-    this.sortApp()
+    _apps.sort(sortAppByLRU)
+    updateRouter({ ...loadingApp, handler: OsHandler.LOAD })
 
     return this
   }
 
-  open = appName => {
-    const openingApp = this.getApp(appName)
+  open = openingApp => {
     setFrontend(openingApp)
+    updateRouter({ ...openingApp, handler: OsHandler.OPEN })
 
     return this
   }
 
-  suspend = appName => {
-    const suspendingApp = this.getApp(appName)
+  suspend = suspendingApp => {
     setBackend(suspendingApp)
+    updateRouter({ ...suspendingApp, handler: OsHandler.SUSPEND })
 
     return this
   }
 
-  kill = appName => {
-    const killingApp = this.getApp(appName)
+  kill = killingApp => {
     setUnload(killingApp)
+    updateRouter({ ...killingApp, handler: OsHandler.KILL })
 
     return this
   }
 
   suspendOpendApp = () => {
-    this._apps
+    _apps
       .filter(app => app.state === AppState.FRONTEND)
-      .forEach(app => this.suspend(app.name))
+      .forEach(app => this.suspend(app))
 
     return this
   }
 
   killOverflowApp = () => {
-    const backendApp = this._apps
+    const backendApp = _apps
       .filter(app => app.state === AppState.BACKEND)
 
     if (backendApp.length >= MAX_APP) {
@@ -124,14 +137,20 @@ export default class AppManager {
     return this
   }
 
-  sortApp () {
-    this._apps.sort(sortAppByLRU)
+  getApps = () => _apps
+  getApp = (appName, flag) => {
+    const App = _apps.find(app => app.name === appName)
+
+    invariant(
+      !flag && !App,
+      `No such App named \`${appName}\``,
+    )
+
+    return App
   }
-
-  getApp = name => this._apps.find(app => app.name === name)
-  getApps = () => this._apps
-
-  getBackendApps = () => this._apps.filter(app => app.state === AppState.BACKEND)
-  getFrontendApps = () => this._apps.filter(app => app.state === AppState.FRONTEND)
-  getUnloadApps = () => this._apps.filter(app => app.state === AppState.UNLOAD)
+  getUnloadApps = () => _apps.filter(app => app.state === AppState.UNLOAD)
+  getBackendApps = () => _apps.filter(app => app.state === AppState.BACKEND)
+  getFrontendApps = () => _apps.filter(app => app.state === AppState.FRONTEND)
 }
+
+export default new AppManager()

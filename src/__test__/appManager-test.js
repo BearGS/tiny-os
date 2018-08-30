@@ -1,5 +1,5 @@
 // const appManager = require('../AppManager')
-import appManager from '../AppManager'
+import manager from '../AppManager'
 import sleep from '../utils/sleep'
 
 const appTestData = [
@@ -38,7 +38,6 @@ const appTestData = [
 describe('appManager', () => {
   it('throws if name param is null or undefined or empty string or non-string', () => {
     expect(() => {
-      const manager = new appManager()
       manager.register()
     })
       .toThrowError('Invalid params name')
@@ -46,7 +45,6 @@ describe('appManager', () => {
   
   it('throws if url param is null or undefined or empty string or non-string', () => {
     expect(() => {
-      const manager = new appManager()
       manager.register({ 
         name: 'sdf',
         url: '',
@@ -56,7 +54,6 @@ describe('appManager', () => {
   })
 
   it('should register and launch all right', async () => {
-    const manager = new appManager()
     manager.registerAll(appTestData)
 
     expect(() => manager.launch('non-app'))

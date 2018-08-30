@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
-import AppManager from './AppManager'
+import appManager from './AppManager'
+import router from './Router'
 
 const _modules = {}
 
@@ -14,16 +15,22 @@ export default class Host {
       configurable: false,
       writable: false,
     })
+  }
 
-    this.appManager = new AppManager()
+  configContainer (container) {
+    router.configContainer(container)
   }
 
   registerApp (app) {
-    this.appManager.register(app)
+    appManager.register(app)
+  }
+
+  registerAll (apps) {
+    appManager.registerAll(apps)
   }
 
   launchApp (app) {
-    this.appManager.launch(app)
+    appManager.launch(app)
   }
 
   use = (module, ...options) => {
