@@ -79,7 +79,6 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "npm run lint:fix",
-      "jest --bail --findRelatedTests",
       "git add"
     ]
   }

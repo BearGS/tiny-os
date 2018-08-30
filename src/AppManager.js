@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-// import router from './Router'
+import router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
 import { AppState, MAX_APP, AppPriority, OsHandler } from './constants'
@@ -18,13 +18,13 @@ function setUnload (app) {
   app.loadTime = 0
 }
 function updateRouter (app) {
-  // router.updateRouterMap(_apps)
-  // if (app) {
-  //   router.render(app)
-  //   if (app.handler === OsHandler.OPEN) {
-  //     router.goRouter(app)
-  //   }
-  // }
+  router.updateRouterMap(_apps)
+  if (app) {
+    router.render(app)
+    if (app.handler === OsHandler.OPEN) {
+      router.goRouter(app)
+    }
+  }
 }
 
 class AppManager {
@@ -39,7 +39,7 @@ class AppManager {
       writable: false,
     })
 
-    // router.history.listen(this.onOuterAppChange.bind(this))
+    router.history.listen(this.onOuterAppChange.bind(this))
   }
 
   register = ({

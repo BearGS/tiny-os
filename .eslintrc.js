@@ -213,3 +213,11 @@ module.exports = {
     'import/no-webpack-loader-syntax': 'error',
   }
 }
+
+// "lint-staged": {
+//   "*.{js,jsx,ts,tsx}": [
+//     "npm run lint:fix",
+//     "jest --bail --findRelatedTests",
+//     "git add"
+//   ]
+// }
