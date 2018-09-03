@@ -4,13 +4,13 @@ import router from './Router'
 
 const _modules = {}
 
-export default class Host {
+export default class Os {
   constructor () {
-    if (typeof Host.instance === 'object'
-      && Host.instance instanceof Host) {
-      return Host.instance
+    if (typeof Os.instance === 'object'
+      && Os.instance instanceof Os) {
+      return Os.instance
     }
-    Object.defineProperty(Host, 'instance', {
+    Object.defineProperty(Os, 'instance', {
       value: this,
       configurable: false,
       writable: false,

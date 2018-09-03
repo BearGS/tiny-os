@@ -1,10 +1,10 @@
 import { OsHandler } from './constants'
+import { _apps as routerMap } from './App'
 import invariant from './utils/invariant'
 import createHistoryFactory from './utils/createHistoryFactory'
 import { createIframe, removeIframe, hideIframe, showIframe } from './utils/iframe'
 
 let currentUrl = ''
-let routerMap = []
 let iframeMap = []
 
 function getIframe (app) {
@@ -35,13 +35,9 @@ class Router {
   constructor (initUrl) {
     currentUrl = initUrl || window.location.hash || ''
     this.history = createHistoryFactory(window.history)
-    // this.unlisten = this.history.listen(this.render.bind(this))
-    // currentUrl && this.goRouter({ name: currentUrl }) // eslint-disable-line
   }
 
-  updateRouterMap = appMap => {
-    routerMap = appMap
-  }
+  listen = fn => this.history.listen(fn)
 
   configContainer = container => {
     if (typeof container === 'string') {
@@ -51,10 +47,17 @@ class Router {
     }
   }
 
+  updateRouter = app => {
+    this.render(app)
+    if (app.handler === OsHandler.OPEN) {
+      this.goRouter(app)
+    }
+  }
+
   goRouter = ({ name, handler }) => this.history.setHash({ hash: name, handler })
-  // goRouter = ({ name, handler }) => this.render({ hash: name, handler })
-  render = ({ name = '', handler }) => {
+  render = ({ name = '', handler } = {}) => {
     const app = getRouter(name)
+
     switch (handler) {
       case OsHandler.LOAD:
         this.loadIframe(app)

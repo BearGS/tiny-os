@@ -1,31 +1,9 @@
 /* eslint-disable no-param-reassign */
+import App, { _apps } from './App'
 import router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { AppState, MAX_APP, AppPriority, OsHandler } from './constants'
-
-const _apps = []
-
-function setBackend (app) {
-  app.state = AppState.BACKEND
-  app.loadTime = Date.now()
-}
-function setFrontend (app) {
-  app.state = AppState.FRONTEND
-}
-function setUnload (app) {
-  app.state = AppState.UNLOAD
-  app.loadTime = 0
-}
-function updateRouter (app) {
-  router.updateRouterMap(_apps)
-  if (app) {
-    router.render(app)
-    if (app.handler === OsHandler.OPEN) {
-      router.goRouter(app)
-    }
-  }
-}
+import { MAX_APP, AppPriority, OsHandler } from './constants'
 
 class AppManager {
   constructor () {
@@ -39,7 +17,7 @@ class AppManager {
       writable: false,
     })
 
-    router.history.listen(this.onOuterAppChange.bind(this))
+    router.listen(this.onOuterAppChange.bind(this))
   }
 
   register = ({
@@ -62,14 +40,16 @@ class AppManager {
       `you've already register another app named \`${name}\``,
     )
 
-    const registeringApp = { name, url, priority }
+    const registeringApp = new App({ name, url, priority })
     _apps.unshift(registeringApp)
-    setUnload(registeringApp)
-    updateRouter()
   }
 
   registerAll = apps => {
     apps.forEach(app => this.register(app))
+    const appName = router.history.location.hash.slice(1)
+    if (appName) {
+      this.launch(appName)
+    }
   }
 
   // outer hash change, for example, directly click a Tag with hash
@@ -94,37 +74,37 @@ class AppManager {
   }
 
   load = loadingApp => {
-    setBackend(loadingApp)
+    loadingApp.toBackend()
     _apps.sort(sortAppByLRU)
-    updateRouter({ ...loadingApp, handler: OsHandler.LOAD })
+    router.updateRouter({ ...loadingApp, handler: OsHandler.LOAD })
 
     return this
   }
 
   open = openingApp => {
-    setFrontend(openingApp)
-    updateRouter({ ...openingApp, handler: OsHandler.OPEN })
+    openingApp.toFrontend()
+    router.updateRouter({ ...openingApp, handler: OsHandler.OPEN })
 
     return this
   }
 
   suspend = suspendingApp => {
-    setBackend(suspendingApp)
-    updateRouter({ ...suspendingApp, handler: OsHandler.SUSPEND })
+    suspendingApp.toBackend()
+    router.updateRouter({ ...suspendingApp, handler: OsHandler.SUSPEND })
 
     return this
   }
 
   kill = killingApp => {
-    setUnload(killingApp)
-    updateRouter({ ...killingApp, handler: OsHandler.KILL })
+    killingApp.toUnload()
+    router.updateRouter({ ...killingApp, handler: OsHandler.KILL })
 
     return this
   }
 
   suspendOpendApp = () => {
     _apps
-      .filter(app => app.state === AppState.FRONTEND)
+      .filter(app => app.isFrontendApp)
       .forEach(app => this.suspend(app))
 
     return this
@@ -132,10 +112,11 @@ class AppManager {
 
   killOverflowApp = () => {
     const backendApp = _apps
-      .filter(app => app.state === AppState.BACKEND)
+      .filter(app => app.isBackendApp)
+
     if (backendApp.length >= MAX_APP) {
-      const killedApp = backendApp.pop()
-      this.kill(killedApp)
+      const killingApp = backendApp.pop()
+      this.kill(killingApp)
     }
 
     return this
@@ -143,18 +124,18 @@ class AppManager {
 
   getApps = () => _apps
   getApp = (appName, flag) => {
-    const App = _apps.find(app => app.name === appName)
+    const App2 = _apps.find(app => app.name === appName)
 
     invariant(
-      !flag && !App,
+      !flag && !App2,
       `No such App named \`${appName}\``,
     )
 
-    return App
+    return App2
   }
-  getUnloadApps = () => _apps.filter(app => app.state === AppState.UNLOAD)
-  getBackendApps = () => _apps.filter(app => app.state === AppState.BACKEND)
-  getFrontendApps = () => _apps.filter(app => app.state === AppState.FRONTEND)
+  getUnloadApps = () => _apps.filter(app => app.isUnloadApp)
+  getBackendApps = () => _apps.filter(app => app.isBackendApp)
+  getFrontendApps = () => _apps.filter(app => app.isFrontendApp)
 }
 
 export default new AppManager()

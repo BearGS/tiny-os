@@ -1,18 +1,18 @@
-import { Host } from '../src/'
+import { TOS } from '../src/'
 import appData from './appData'
 
 if (module.hot) {
   module.hot.accept()
 }
 
-const host = new Host()
-host.configContainer('app-container')
-host.registerAll(appData)
-host.launchApp('order')
+const tos = new TOS()
+tos.configContainer('app-container')
+tos.registerAll(appData)
+// tos.launchApp('order')
 
 appData.map(data => data.name)
   .forEach(name => {
     document.getElementById(`app-${name}`)
-      .addEventListener('click', () => host.launchApp(name))
+      .addEventListener('click', () => tos.launchApp(name))
   })
 

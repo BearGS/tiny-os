@@ -68,6 +68,10 @@ module.exports = {
     commonjs: true,
     jest: true
   },
+  globals: {
+    __DEV__: true,
+    __PROD__: true,
+  },
   parser: 'babel-eslint',
   parserOptions: {
     sourceType: 'module',

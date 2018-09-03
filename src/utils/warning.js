@@ -1,7 +1,7 @@
 /* eslint-disable */
 let warning = () => {};
 
-if (process.env.NODE_ENV !== 'production') {
+if (__DEV__) {
   const printWarning = function(format, ...args) {
     let argIndex = 0;
     const message = 'Warning: ' + format.replace(/%s/g, () => args[argIndex++]);

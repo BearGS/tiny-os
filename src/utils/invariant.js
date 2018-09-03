@@ -1,15 +1,15 @@
-/* eslint-disable */
 let validateFormat = () => {}
 
-if (process.env.NODE_ENV !== 'production') {
-  validateFormat = function(format) {
+if (__DEV__) {
+  validateFormat = format => {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument')
     }
   }
 }
 
-export default function invariant(condition, format, ...args) {
+/* eslint-disable */
+export default function invariant (condition, format, ...args) {
   validateFormat(format)
 
   if (condition) {

@@ -1,42 +1,37 @@
+import { AppState, AppPriority } from './constants'
+
+export const _apps = []
+
 export default class App {
-  constructor () {
-    if (typeof App.instance === 'object'
-      && App.instance instanceof App) {
-      return App.instance
-    }
-    Object.defineProperty(App, 'instance', {
-      value: this,
-      configurable: false,
-      writable: false,
-    })
+  constructor ({ name, url, priority }) {
+    this.name = name
+    this.url = url
+    this.priority = priority || AppPriority.TEMPORARY
+    this.state = AppState.UNLOAD
+    this.loadTime = 0
+    this.isWhatApp()
   }
 
-  invoke = () => new Promise()
-
-  onRegister = () => {
+  toUnload = () => {
+    this.state = AppState.UNLOAD
+    this.loadTime = 0
+    this.isWhatApp()
   }
 
-  onLoad = () => {
-
+  toBackend = () => {
+    this.state = AppState.BACKEND
+    this.loadTime = Date.now()
+    this.isWhatApp()
   }
 
-  onUnload = () => {
-
+  toFrontend = () => {
+    this.state = AppState.FRONTEND
+    this.isWhatApp()
   }
 
-  onOpen = () => {
-
-  }
-
-  onUnopen = () => {
-
-  }
-
-  onSuspend = () => {
-
-  }
-
-  onKill = () => {
-
+  isWhatApp = () => {
+    this.isUnloadApp = this.state === AppState.UNLOAD
+    this.isBackendApp = this.state === AppState.BACKEND
+    this.isFrontendApp = this.state === AppState.FRONTEND
   }
 }

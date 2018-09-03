@@ -25,5 +25,8 @@ module.exports = new Config()
         filename: 'index.html',
       }),
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.DefinePlugin({
+        __DEV__: true
+      }),
     ],
   })
