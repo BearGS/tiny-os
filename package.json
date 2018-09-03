@@ -70,8 +70,12 @@
   "author": "xgs",
   "license": "MIT",
   "jest": {
-    "testRegex": "src/__test__/[^/]*(\\.js|\\.coffee|[^d]\\.ts)$"
-  },  
+    "testRegex": "src/__test__/[^/]*(\\.js|\\.coffee|[^d]\\.ts)$",
+    "globals": {
+      "__DEV__": true,
+      "__TEST__": true
+    }
+  },
   "pre-commit": {
     "run": "lint-staged",
     "silent": true
@@ -79,6 +83,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "npm run lint:fix",
+      "jest --bail --findRelatedTests",
       "git add"
     ]
   }

@@ -1,4 +1,5 @@
-// const appManager = require('../AppManager')
+jest.mock('../Router')
+import router from '../__mocks__/Router'
 import manager from '../AppManager'
 import sleep from '../utils/sleep'
 

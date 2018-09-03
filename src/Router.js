@@ -6,6 +6,7 @@ import { createIframe, removeIframe, hideIframe, showIframe } from './utils/ifra
 
 let currentUrl = ''
 
+
 function getApp (name) {
   const app = routerMap.find(router => router.name === name)
 
