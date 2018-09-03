@@ -3,7 +3,7 @@ import App, { _apps } from './App'
 import router from './Router'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { MAX_APP, AppPriority, OsHandler } from './constants'
+import { MAX_APP, OsHandler } from './constants'
 
 class AppManager {
   constructor () {
@@ -23,7 +23,7 @@ class AppManager {
   register = ({
     name,
     url,
-    priority = AppPriority.TEMPORARY
+    priority,
   } = {}) => {
     invariant(
       !name || typeof name !== 'string',
@@ -42,25 +42,30 @@ class AppManager {
 
     const registeringApp = new App({ name, url, priority })
     _apps.unshift(registeringApp)
-  }
 
-  registerAll = apps => {
-    apps.forEach(app => this.register(app))
     const appName = router.history.location.hash.slice(1)
     if (appName) {
-      this.launch(appName)
+      const app = this.getApp(appName, true)
+
+      if (app) {
+        this.launch(app.name)
+      }
     }
   }
+
+  registerAll = apps => apps.forEach(app => this.register(app))
 
   // outer hash change, for example, directly click a Tag with hash
   onOuterAppChange = ({ hash = '' }) => {
     if (!hash) return
+
     const appName = hash.slice(1)
     const app = this.getApp(appName, true)
-    if (app) {
-      this.launch(app.name)
+
+    if (!app) {
+      this.suspendOpendApp()
     } else {
-      window.location.hash = hash
+      this.launch(app.name)
     }
   }
 

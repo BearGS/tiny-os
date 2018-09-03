@@ -5,20 +5,8 @@ import createHistoryFactory from './utils/createHistoryFactory'
 import { createIframe, removeIframe, hideIframe, showIframe } from './utils/iframe'
 
 let currentUrl = ''
-let iframeMap = []
 
-function getIframe (app) {
-  const iframeApp = iframeMap.find(item => item.name === app.name)
-
-  invariant(
-    !iframeApp,
-    `No such Iframe named \`${app.name}\``,
-  )
-
-  return iframeApp.iframe
-}
-
-function getRouter (name) {
+function getApp (name) {
   const app = routerMap.find(router => router.name === name)
 
   invariant(
@@ -47,26 +35,26 @@ class Router {
     }
   }
 
-  updateRouter = app => {
-    this.render(app)
-    if (app.handler === OsHandler.OPEN) {
-      this.goRouter(app)
+  updateRouter = ({ name, handler }) => {
+    this.render({ name, handler })
+
+    if (handler === OsHandler.OPEN) {
+      this.history.setHash({ hash: name, handler })
     }
   }
 
-  goRouter = ({ name, handler }) => this.history.setHash({ hash: name, handler })
   render = ({ name = '', handler } = {}) => {
-    const app = getRouter(name)
+    const app = getApp(name)
 
     switch (handler) {
       case OsHandler.LOAD:
         this.loadIframe(app)
         break
       case OsHandler.OPEN:
-        showIframe(getIframe(app))
+        showIframe(app.iframe)
         break
       case OsHandler.SUSPEND:
-        hideIframe(getIframe(app))
+        hideIframe(app.iframe)
         break
       case OsHandler.KILL:
         this.killIframe(app)
@@ -76,16 +64,16 @@ class Router {
     }
   }
 
-  loadIframe = ({ name, url }) => {
-    if (!iframeMap.find(iframe => iframe.name === name)) {
-      const iframe = createIframe(this.container, name, url)
-      iframeMap.push({ name, iframe })
+  loadIframe = app => {
+    if (!app.iframe) {
+      const iframe = createIframe(this.container, app.name, app.url)
+      app.iframe = iframe // eslint-disable-line
     }
   }
 
-  killIframe = ({ name }) => {
-    removeIframe(this.container, name)
-    iframeMap = iframeMap.filter(item => item.name !== name)
+  killIframe = app => {
+    removeIframe(this.container, app.name)
+    app.iframe = null // eslint-disable-line
   }
 
   getCurrentUrl = () => currentUrl

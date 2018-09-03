@@ -1,7 +1,4 @@
 /* eslint-disable no-param-reassign */
-// export function insert(iframe, target) {
-//   target.appendChild(iframe)
-// }
 
 export function createIframe (container, name, uri) {
   const iframe = document.createElement('iframe')

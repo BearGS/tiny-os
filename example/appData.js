@@ -31,4 +31,9 @@ const appData = [
   }
 ]
 
+// const appData = {
+//   name: 'goods',
+//   url: 'http://localhost:8686/goods.html',
+//   priority: 'temporary',
+// }
 export default appData
