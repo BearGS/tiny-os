@@ -21,6 +21,7 @@ class AppManager {
       'Invalid params name',
     )
 
+
     invariant(
       !url || typeof url !== 'string',
       'Invalid params url',

@@ -59,7 +59,7 @@ describe('appManager', () => {
 
     expect(() => manager.launch('non-app'))
       .toThrow('No such App named `non-app`')
-    expect(manager.getApps().length).toBe(9)
+    expect(manager.getApps().length).toBe(6)
     expect(manager.getApps()[0].name).toBe('order')
     
     manager.launch('goods')
