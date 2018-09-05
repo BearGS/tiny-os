@@ -1,44 +1,49 @@
-import uuidV4 from 'uuid/v4'
+// import uuidV4 from 'uuid/v4'
 import {
   TOS_REQUEST_PACKET_TYPE,
-  TOS_MESSAGE_PACKET_TYPE,
+  TOS_EVENT_PACKET_TYPE,
   TOS_RESPONSE_PACKET_TYPE
 } from './tosSymbols'
 import invariant from './utils/invariant'
-import { ProcedureType, ModuleType } from './constants'
+import { MethodType, ServiceType } from './constants'
 
 class Packet {
+  /**
+   * @param  {String} service // rpc service, it can be App, Module, Worker
+   * @param  {String} method // rpc method
+   * @param  {Object} params
+   */
   constructor ({
-    module,
-    procedure,
+    service,
+    method,
     params = {},
   } = {}) {
     invariant(
-      typeof module !== ModuleType ||
-        module === '' ||
-        module == null,
+      typeof service !== ServiceType ||
+        service === '' ||
+        service == null,
       'parmas module must not be null or undefined or empty string' +
-        `and must be \`${ModuleType}\` type`,
+        `and must be \`${ServiceType}\` type`,
     )
 
     invariant(
-      typeof procedure !== ProcedureType ||
-        procedure === '' ||
-        procedure == null,
-      'parmas procedure must not be null or undefined or empty string' +
-        `and must be \`${ProcedureType}\` type`,
+      typeof method !== MethodType ||
+        method === '' ||
+        method == null,
+      'parmas method must not be null or undefined or empty string' +
+        `and must be \`${MethodType}\` type`,
     )
 
-    this.id = uuidV4()
-    this.module = module
-    this.procedure = procedure
+    this.service = service
+    this.method = method
     this.params = params
   }
 }
 
-export class RequestPacket extends Packet {
+export class InvokePacket extends Packet {
   constructor (payload) {
     super(payload)
+    // this.id = uuidV4()
     this.type = TOS_REQUEST_PACKET_TYPE
   }
 }
@@ -50,9 +55,10 @@ export class ResponsePacket extends Packet {
   }
 }
 
-export class messagePacket extends Packet {
-  constructor (payload) {
-    super(payload)
-    this.type = TOS_MESSAGE_PACKET_TYPE
+export class EventPacket {
+  constructor ({ params }) {
+    // this.id = uuidV4()
+    this.type = TOS_EVENT_PACKET_TYPE
+    this.params = params
   }
 }

@@ -1,22 +1,13 @@
 /* eslint-disable no-param-reassign */
-import App, { _apps } from './App'
 import router from './Router'
+import App, { _apps } from './App'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { MAX_APP, OsHandler } from './constants'
+import { OsHandler, MAX_APP } from './constants'
 
 class AppManager {
   constructor () {
-    if (typeof AppManager.instance === 'object'
-      && AppManager.instance instanceof AppManager) {
-      return AppManager.instance
-    }
-    Object.defineProperty(AppManager, 'instance', {
-      value: this,
-      configurable: false,
-      writable: false,
-    })
-
+    this.maxAppNum = MAX_APP
     router.listen(this.onOuterAppChange.bind(this))
   }
 
@@ -36,16 +27,16 @@ class AppManager {
     )
 
     invariant(
-      this.getApp(name, true),
+      this.getApp(name),
       `you've already register another app named \`${name}\``,
     )
 
     const registeringApp = new App({ name, url, priority })
     _apps.unshift(registeringApp)
 
-    const appName = router.history.location.hash.slice(1)
+    const appName = window.location.hash.slice(1)
     if (appName) {
-      const app = this.getApp(appName, true)
+      const app = this.getApp(appName)
 
       if (app) {
         this.launch(app.name)
@@ -55,12 +46,11 @@ class AppManager {
 
   registerAll = apps => apps.forEach(app => this.register(app))
 
-  // outer hash change, for example, directly click a Tag with hash
-  onOuterAppChange = ({ hash = '' }) => {
-    if (!hash) return
+  // outer hash change. for example: click a link with hash
+  onOuterAppChange = ({ hash: appName = '' }) => {
+    if (!appName) return
 
-    const appName = hash.slice(1)
-    const app = this.getApp(appName, true)
+    const app = this.getApp(appName)
 
     if (!app) {
       this.suspendOpendApp()
@@ -70,39 +60,41 @@ class AppManager {
   }
 
   launch = appName => {
-    const app = this.getApp(appName)
+    const launchingApp = this.getApp(appName)
+    invariant(!launchingApp, `No such App named \`${appName}\``)
+
     this
       .suspendOpendApp()
-      .load(app)
-      .open(app)
+      .load(launchingApp)
+      .open(launchingApp)
       .killOverflowApp()
   }
 
   load = loadingApp => {
     loadingApp.toBackend()
     _apps.sort(sortAppByLRU)
-    router.updateRouter({ ...loadingApp, handler: OsHandler.LOAD })
+    router.render({ ...loadingApp, handler: OsHandler.LOAD })
 
     return this
   }
 
   open = openingApp => {
     openingApp.toFrontend()
-    router.updateRouter({ ...openingApp, handler: OsHandler.OPEN })
+    router.render({ ...openingApp, handler: OsHandler.OPEN })
 
     return this
   }
 
   suspend = suspendingApp => {
     suspendingApp.toBackend()
-    router.updateRouter({ ...suspendingApp, handler: OsHandler.SUSPEND })
+    router.render({ ...suspendingApp, handler: OsHandler.SUSPEND })
 
     return this
   }
 
   kill = killingApp => {
     killingApp.toUnload()
-    router.updateRouter({ ...killingApp, handler: OsHandler.KILL })
+    router.render({ ...killingApp, handler: OsHandler.KILL })
 
     return this
   }
@@ -119,7 +111,7 @@ class AppManager {
     const backendApp = _apps
       .filter(app => app.isBackendApp)
 
-    if (backendApp.length >= MAX_APP) {
+    if (backendApp.length >= this.maxAppNum) {
       const killingApp = backendApp.pop()
       this.kill(killingApp)
     }
@@ -127,18 +119,16 @@ class AppManager {
     return this
   }
 
-  getApps = () => _apps
-  getApp = (appName, flag) => {
-    const App2 = _apps.find(app => app.name === appName)
+  killExpiredApp = () => {} // kill超时backend APP
 
-    invariant(
-      !flag && !App2,
-      `No such App named \`${appName}\``,
-    )
-
-    return App2
+  configMaxAppNum = num => {
+    this.maxAppNum = num
   }
+
+  getApps = () => _apps
+  getApp = appName => _apps.find(app => app.name === appName)
   getUnloadApps = () => _apps.filter(app => app.isUnloadApp)
+  getLoadedApps = () => _apps.filter(app => !app.isUnloadApp)
   getBackendApps = () => _apps.filter(app => app.isBackendApp)
   getFrontendApps = () => _apps.filter(app => app.isFrontendApp)
 }

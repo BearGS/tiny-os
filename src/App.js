@@ -4,11 +4,12 @@ export const _apps = []
 
 export default class App {
   constructor ({ name, url, priority }) {
-    this.name = name
     this.url = url
-    this.priority = priority || AppPriority.TEMPORARY
-    this.state = AppState.UNLOAD
+    this.name = name
     this.loadTime = 0
+    this.iframe = null
+    this.state = AppState.UNLOAD
+    this.priority = priority || AppPriority.TEMPORARY
     this.isWhatApp()
   }
 

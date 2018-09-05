@@ -6,32 +6,32 @@ import sleep from '../utils/sleep'
 const appTestData = [
   {
     name: 'shop',
-    url: 'www.shop.ele.me',
+    url: 'www.shop.com',
     priority: 'temporary',
   },
   {
     name: 'finance',
-    url: 'www.finance.ele.me',
+    url: 'www.finance.com',
     priority: 'temporary',
   },
   {
     name: 'stats',
-    url: 'www.stats.ele.me',
+    url: 'www.stats.com',
     priority: 'temporary',
   },
   {
     name: 'carts',
-    url: 'www.carts.ele.me',
+    url: 'www.carts.com',
     priority: 'temporary',
   },
   {
     name: 'goods',
-    url: 'www.goods.ele.me',
+    url: 'www.goods.com',
     priority: 'temporary',
   },
   {
     name: 'order',
-    url: 'www.order.ele.me',
+    url: 'www.order.com',
     priority: 'forever'
   }
 ]
@@ -59,7 +59,7 @@ describe('appManager', () => {
 
     expect(() => manager.launch('non-app'))
       .toThrow('No such App named `non-app`')
-    expect(manager.getApps().length).toBe(6)
+    expect(manager.getApps().length).toBe(9)
     expect(manager.getApps()[0].name).toBe('order')
     
     manager.launch('goods')

@@ -8,7 +8,6 @@ const { uglify } = require('rollup-plugin-uglify')
 const { minify } = require('uglify-es')
 
 module.exports = {
-  external: ['crypto'],
   plugins: [
     alias({
       resolve: ['.js']
@@ -23,34 +22,27 @@ module.exports = {
     eslint({
       include: ['src/**/*.js']
     }),
-    babel({
+    babel({      
       "ignore": [
         "node_modules/**"
       ],
       "env": {
-        "test": {
-          "presets": [
-            ["env", {
-              "targets": {
-                "browsers": ["chrome > 50", "ios > 6", "android > 4.4"]
-              }
-            }],
-            "stage-2"
-          ]
-        },
-        "production": {
-          "presets": [
-            ["env", {
-              "targets": {
-                "browsers": ["chrome > 50", "ios > 6", "android > 4.4"]
-              },
-              "modules": false
-            }],
-            "stage-2"
-          ],
-          "plugins": ["external-helpers"]
-        }
-      }
+        "presets": [
+          ["env", {
+            "targets": {
+              "browsers": ["chrome > 50", "ios > 6", "android > 4.4"]
+            },
+            "modules": false
+          }],
+          "stage-2"
+        ],
+      },
+      "plugins": [
+        "external-helpers",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        "transform-decorators-legacy",
+      ]
     }),
     uglify(
       {

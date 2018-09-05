@@ -1,6 +1,6 @@
 const router = {
   listen: () => {},
-  updateRouter: () => {},
+  render: () => {},
   history: {
     location: {
       hash: ''

@@ -1,36 +1,53 @@
-/* eslint-disable no-param-reassign */
-import appManager from './AppManager'
+// /* eslint-disable no-param-reassign */
+import mom from './Mom'
 import router from './Router'
-
-const _modules = {}
+import appManager from './AppManager'
+import moduleManager from './ModuleManager'
+import { EventPacket, InvokePacket } from './packet'
+import { sendToChildIframe } from './utils/communication'
+import { MAX_APP } from './constants'
 
 export default class Os {
-  constructor () {
+  constructor (configs) {
     if (typeof Os.instance === 'object'
       && Os.instance instanceof Os) {
       return Os.instance
     }
+
     Object.defineProperty(Os, 'instance', {
       value: this,
       configurable: false,
       writable: false,
     })
+    this.init(configs)
   }
 
   launchApp = app => appManager.launch(app)
   registerApp = app => appManager.register(app)
   registerAll = apps => appManager.registerAll(apps)
+  use = module => moduleManager.use(module)
+  useAll = modules => moduleManager.useAll(modules)
   configContainer = container => router.configContainer(container)
-  getApps = () => appManager.getApps()
-  use = (module, ...options) => {
-    if (module.installed) {
-      return
-    }
-    module.install(this.modules, options)
-    module.installed = true
 
-    return this // eslint-disable-line
+  init = ({
+    apps = [],
+    modules = [],
+    container = '',
+    maxAppNum = MAX_APP,
+    // expiredTime = EXPIRED_TIME,
+  } = {}) => {
+    router.configContainer(container)
+    appManager.configMaxAppNum(maxAppNum)
+    appManager.registerAll(apps)
+    moduleManager.useAll(modules)
   }
-  getModules = () => _modules
-  getModule = module => _modules[module]
+
+  broadcast = message => {
+    appManager
+      .getLoadedApps()
+      .forEach(app => sendToChildIframe(app.iframe, new EventPacket(message)))
+  }
+
+  invoke = invokePacket => mom.invoke(new InvokePacket(invokePacket))
 }
+

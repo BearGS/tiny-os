@@ -26,38 +26,30 @@ export default function createHistoryFactory (originHistory) {
   const setState = ({
     path = history.location.pathname,
     state = history.state,
-    hash = history.location.hash,
-    handler = '',
-  } = {}) => {
-    routeManager.notify({
-      path, state, hash, handler
-    })
-  }
+    hash = history.location.hash.slice(1),
+  } = {}) => routeManager.notify({ path, state, hash })
 
-  const handlePopState = () => {
-    // setState()
-  }
-  const handleHashChange = () => {
-    setState()
-  }
+  const handlePopState = () => {}
+  const handleHashChange = setState
+
   window.addEventListener(PopStateEvent, handlePopState)
   window.addEventListener(HashChangeEvent, handleHashChange)
 
   const go = n => originHistory.go(n)
   const back = () => originHistory.go(-1)
   const forward = () => originHistory.go(1)
-  const push = (path, state, handler) => {
+  const push = (path, state) => {
     originHistory.pushState(state, '', path)
-    setState({ handler })
+    setState()
   }
-  const replace = (path, state, handler) => {
+  const replace = (path, state) => {
     originHistory.replaceState(state, '', path)
-    setState({ handler })
+    setState()
   }
-  const setHash = ({ hash, handler }) => {
+  const setHash = ({ hash }) => {
     if (history.location.hash !== `#${hash}`) {
       originHistory.pushState(null, null, `#${hash}`)
-      setState({ handler })
+      setState()
     }
   }
 

@@ -5,7 +5,8 @@ const paths = require('../config/paths')
 const { name, version, author } =  require(paths.appPackageJson)
 
 const entries = {
-  'tiny-os': 'src/index.js',
+  'os': 'src/os.js',
+  'sdk': 'src/sdk.js',
 }
 
 const banner =
@@ -23,27 +24,18 @@ const modules = Object.keys(entries)
         format: 'umd',
         name: `${key}.umd.js`,
         file: `dist/${key}.umd.js`,  
-        globals: {
-          crypto: global.crypto,
-        },
       },
       {
         banner,
         format: 'cjs',
         name: `${key}.cjs.js`,
         file: `dist/${key}.cjs.js`,  
-        globals: {
-          crypto: global.crypto,
-        },
       },
       {
         banner,
         format: 'es',
-        name: `${key}.esm`,
+        name: `${key}.esm.js`,
         file: `dist/${key}.esm.js`,  
-        globals: {
-          crypto: global.crypto,
-        },
       },
     ],
   }))
