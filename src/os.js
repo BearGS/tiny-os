@@ -5,7 +5,6 @@ import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { EventPacket, InvokePacket } from './packet'
 import { sendToChildIframe } from './utils/communication'
-import { MAX_APP } from './constants'
 
 export default class Os {
   constructor (configs) {
@@ -32,8 +31,8 @@ export default class Os {
   init = ({
     apps = [],
     modules = [],
-    container = '',
-    maxAppNum = MAX_APP,
+    container,
+    maxAppNum,
     // expiredTime = EXPIRED_TIME,
   } = {}) => {
     router.configContainer(container)

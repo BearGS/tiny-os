@@ -1,4 +1,4 @@
-// import uuidV4 from 'uuid/v4'
+import uuid from './utils/uuid'
 import {
   TOS_REQUEST_PACKET_TYPE,
   TOS_EVENT_PACKET_TYPE,
@@ -9,11 +9,13 @@ import { MethodType, ServiceType } from './constants'
 
 class Packet {
   /**
+   * @param  {String} origin // rpc caller, it can be App, Module, Worker, os self
    * @param  {String} service // rpc service, it can be App, Module, Worker
    * @param  {String} method // rpc method
    * @param  {Object} params
    */
   constructor ({
+    origin,
     service,
     method,
     params = {},
@@ -34,6 +36,7 @@ class Packet {
         `and must be \`${MethodType}\` type`,
     )
 
+    this.origin = origin
     this.service = service
     this.method = method
     this.params = params
@@ -43,7 +46,7 @@ class Packet {
 export class InvokePacket extends Packet {
   constructor (payload) {
     super(payload)
-    // this.id = uuidV4()
+    this.id = uuid()
     this.type = TOS_REQUEST_PACKET_TYPE
   }
 }
@@ -51,13 +54,14 @@ export class InvokePacket extends Packet {
 export class ResponsePacket extends Packet {
   constructor (payload) {
     super(payload)
+    this.id = payload.id
     this.type = TOS_RESPONSE_PACKET_TYPE
   }
 }
 
 export class EventPacket {
-  constructor ({ params }) {
-    // this.id = uuidV4()
+  constructor (params) {
+    this.id = uuid()
     this.type = TOS_EVENT_PACKET_TYPE
     this.params = params
   }

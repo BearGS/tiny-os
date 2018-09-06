@@ -19,7 +19,7 @@
 //   .addEventListener('click', () => tos.launchApp('nonapp'))
 
 
-import { TOS, SDK } from '../src/'
+import TOS from '../src/os'
 import appData from './appData'
 import configs from './configs'
 

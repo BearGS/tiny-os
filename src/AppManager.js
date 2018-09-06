@@ -122,7 +122,7 @@ class AppManager {
 
   killExpiredApp = () => {} // kill超时backend APP
 
-  configMaxAppNum = num => {
+  configMaxAppNum = (num = MAX_APP) => {
     this.maxAppNum = num
   }
 
