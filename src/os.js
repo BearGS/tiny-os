@@ -1,10 +1,12 @@
 // /* eslint-disable no-param-reassign */
-import mom from './Mom'
+import MomOS from './MomOS'
 import router from './Router'
 import appManager from './AppManager'
+import { EventPacket } from './packet'
 import moduleManager from './ModuleManager'
-import { EventPacket, InvokePacket } from './packet'
 import { sendToChildIframe } from './utils/communication'
+
+let mom
 
 export default class Os {
   constructor (configs) {
@@ -18,6 +20,8 @@ export default class Os {
       configurable: false,
       writable: false,
     })
+
+    mom = new MomOS()
     this.init(configs)
   }
 
@@ -47,6 +51,24 @@ export default class Os {
       .forEach(app => sendToChildIframe(app.iframe, new EventPacket(message)))
   }
 
-  invoke = invokePacket => mom.invoke(new InvokePacket(invokePacket))
+  invoke = packet => mom.invoke(packet)
+
+  registerMethod = (methodName, method) => {
+    mom.on(methodName, async packet => {
+      const { payload } = packet
+      try {
+        const result = await method(payload)
+        mom.response({ ...packet, payload: { result } })
+      } catch (e) {
+        mom.response({
+          ...packet,
+          payload: {
+            error: true,
+            errorMessage: e.message,
+          }
+        })
+      }
+    })
+  }
 }
 

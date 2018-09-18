@@ -8,7 +8,7 @@
     "test": "NODE_ENV=test jest",
     "build": "NODE_ENV=production rimraf dist & node scripts/rollup/index.js",
     "test-build": "NODE_ENV=development node scripts/rollup/index.js",
-    "start": "NODE_ENV=development node scripts/webpack/start.js & node example/server.js",
+    "start": "NODE_ENV=development node example/server.js & node scripts/webpack/start.js",
     "lint:fix": "eslint --fix .js,.jsx,.ts,.tsx src  --ignore-pattern '!.eslintrc.js'",
     "lint": "eslint -f 'stylish' --ext .js,.jsx,.ts,.tsx src  --ignore-pattern '!.eslintrc.js'",
     "lint-staged": "lint-staged"

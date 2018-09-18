@@ -2,9 +2,8 @@ const paths = require('../config/paths')
 
 module.exports = {
   entry: {
-    app: [
-      paths.appIndexJs,
-    ],
+    app: [paths.appIndexJs],
+    order: [paths.appOrderJs],
   },
   output: {
     path: paths.appDist,
@@ -49,6 +48,7 @@ module.exports = {
                 'stage-2',
               ],
               plugins: [
+                'transform-runtime',
                 'transform-decorators-legacy',
                 'react-hot-loader/babel',
               ],

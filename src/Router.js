@@ -1,6 +1,6 @@
 import { OsHandler } from './constants'
-import { _apps as routerMap } from './App'
 import invariant from './utils/invariant'
+import { _apps as routerMap } from './App'
 import createHistoryFactory from './utils/createHistoryFactory'
 import { createIframe, removeIframe, hideIframe, showIframe } from './utils/iframe'
 

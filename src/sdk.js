@@ -1,12 +1,15 @@
-import os from './os'
-import mom from './Mom'
-import { EventPacket, InvokePacket } from './packet'
+import Os from './os'
+import MomSDK from './MomSDK'
+import { Role } from './constants'
+import { EventPacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 
+let mom
+
 export default class Sdk {
-  constructor () {
+  constructor (name) {
     if (!this.isInIframe()) {
-      return os
+      return new Os()
     }
 
     if (typeof Sdk.instance === 'object'
@@ -18,11 +21,31 @@ export default class Sdk {
       configurable: false,
       writable: false,
     })
+
+    mom = new MomSDK(name)
+  }
+
+  registerMethod = (methodName, method) => {
+    mom.on(methodName, async packet => {
+      const { payload } = packet
+      try {
+        const result = await method(payload)
+        mom.response({ ...packet, payload: { result } })
+      } catch (e) {
+        mom.response({
+          ...packet,
+          payload: {
+            error: true,
+            errorMessage: e.message,
+          }
+        })
+      }
+    })
   }
 
   isInIframe = () => window.parent !== window
   broadcast = message => sendToParentIframe(new EventPacket(message))
-  invoke = invokePacket => mom.invoke(new InvokePacket(invokePacket))
+  invoke = packet => mom.invoke({ service: Role.OS, ...packet })
 
   onRegister = () => {}
   onLoad = () => {}
@@ -31,5 +54,5 @@ export default class Sdk {
   onUnopen = () => {}
   onSuspend = () => {}
   onKill = () => {}
-  onMessage = () => {}
+  on = (eventName, callback) => mom.on(eventName, callback)
 }

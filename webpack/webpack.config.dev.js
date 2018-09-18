@@ -10,6 +10,9 @@ module.exports = new Config()
       conf.entry.app.unshift(
         require.resolve('react-dev-utils/webpackHotDevClient'),
       )
+      conf.entry.order.unshift(
+        require.resolve('react-dev-utils/webpackHotDevClient'),
+      )
       return conf
     },
   })
@@ -23,6 +26,14 @@ module.exports = new Config()
       new HtmlWebpackPlugin({
         template: paths.appHtml,
         filename: 'index.html',
+        chunks: ['app'],
+        // inject: false,
+      }),
+      new HtmlWebpackPlugin({
+        template: paths.orderHtml,
+        filename: 'order.html',
+        chunks: ['order'],
+        // inject: false,
       }),
       new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({

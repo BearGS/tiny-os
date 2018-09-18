@@ -1,16 +1,16 @@
 /* eslint-disable no-param-reassign */
 import Module, { _modules } from './Module'
 import invariant from './utils/invariant'
+import { checkTypeString } from './utils/checkType'
+import requiredParam from './utils/requiredParam'
+// import compose from './utils/compose'
 
 class ModuleManager {
   use = ({
-    name,
+    name = requiredParam('name'),
     module,
   } = {}) => {
-    invariant(
-      !name || typeof name !== 'string',
-      'Invalid params name',
-    )
+    checkTypeString(name)
 
     invariant(
       this.getModule(name),
@@ -22,6 +22,7 @@ class ModuleManager {
 
   useAll = modules => modules.forEach(module => this.use(module))
   getModule = moduleName => (_modules.find(module => module.name === moduleName) || {}).module
+  hasModule = moduleName => _modules.some(module => module.name === moduleName)
 }
 
 export default new ModuleManager()

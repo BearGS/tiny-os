@@ -4,6 +4,8 @@ import App, { _apps } from './App'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
 import { OsHandler, MAX_APP } from './constants'
+import requiredParam from './utils/requiredParam'
+import { checkTypeString } from './utils/checkType'
 
 class AppManager {
   constructor () {
@@ -12,19 +14,21 @@ class AppManager {
   }
 
   register = ({
-    name,
-    url,
+    name = requiredParam('name'),
+    url = requiredParam('url'),
     priority,
   } = {}) => {
+    checkTypeString(name)
+    checkTypeString(url)
+
     invariant(
-      !name || typeof name !== 'string',
-      'Invalid params name',
+      name === '',
+      'param `name` must not be empty string'
     )
 
-
     invariant(
-      !url || typeof url !== 'string',
-      'Invalid params url',
+      url === '',
+      'param `url` must not be empty string'
     )
 
     invariant(
@@ -128,6 +132,7 @@ class AppManager {
 
   getApps = () => _apps
   getApp = appName => _apps.find(app => app.name === appName)
+  hasApp = appName => _apps.some(app => app.name === appName)
   getUnloadApps = () => _apps.filter(app => app.isUnloadApp)
   getLoadedApps = () => _apps.filter(app => !app.isUnloadApp)
   getBackendApps = () => _apps.filter(app => app.isBackendApp)

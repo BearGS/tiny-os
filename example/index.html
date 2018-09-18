@@ -15,6 +15,10 @@
       flex: 1;
       width: 200px;
     }
+
+    #app-container iframe {
+      height: 100%;
+    }
   </style>
 </head>
 
@@ -40,6 +44,13 @@
       <li><button id="app-shop">shop</button></li>
       <li><button id="app-carts">carts</button></li>
       <li><button id="app-nonapp">nonapp</button></li>
+    </ul>
+    <ul class="nav">
+      communicate with app
+      <li><button id="fetch-order-count">fetch order count</button></li>
+      <li>
+        <div>fetch data: <span id="count"></span></div>
+      </li>
     </ul>
   </div>
   

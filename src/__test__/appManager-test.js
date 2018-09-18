@@ -41,7 +41,7 @@ describe('appManager', () => {
     expect(() => {
       manager.register()
     })
-      .toThrowError('Invalid params name')
+      .toThrowError('param `name` must not be null or undefined')
   })
   
   it('throws if url param is null or undefined or empty string or non-string', () => {
@@ -51,7 +51,7 @@ describe('appManager', () => {
         url: '',
       })
     })
-      .toThrow('Invalid params url')
+      .toThrow('param `url` must not be empty string')
   })
 
   it('should register and launch all right', async () => {

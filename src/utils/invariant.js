@@ -22,10 +22,9 @@ export default function invariant (condition, format, ...args) {
     } else {
       let argIndex = 0
       error = new Error(format.replace(/%s/g, () => args[argIndex++]))
-      // error.name = 'Invariant Violation'
     }
 
-    error.framesToPop = 1 // we don't care about invariant's own frame
+    error.framesToPop = 1
     throw error
   }
 }
