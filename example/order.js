@@ -3,6 +3,10 @@ import SDK from '../src/sdk'
 const sdk = new SDK('order')
 sdk.registerMethod('fetchOrderCount', () => `orderCount: ${Math.round(Math.random() * 100)}`)
 
+sdk.onLaunchApp(data => {
+  console.log('receive data ===', data) // eslint-disable-line
+})
+
 document.getElementById('fetch-order-count')
   .addEventListener('click', () => {
     sdk.invoke({

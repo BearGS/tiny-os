@@ -31,4 +31,12 @@ export const Role = {
   WORKER: 'WORKER',
 }
 
+export const BroadcastEvent = {
+  LAUNCH_APP: 'LAUNCH_APP',
+  LOAD_APP: 'LOAD_APP',
+  OPEN_APP: 'OPEN_APP',
+  KILL_APP: 'KILL_APP',
+  SUSPEND_APP: 'SUSPEND_APP'
+}
+
 export const INVOKE_TIMEOUT = 10000 // 系统间invoke超时时间

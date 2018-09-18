@@ -1,13 +1,13 @@
 import Os from './os'
 import MomSDK from './MomSDK'
-import { Role } from './constants'
+import { Role, BroadcastEvent } from './constants'
 import { EventPacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 
 let mom
 
 export default class Sdk {
-  constructor (name) {
+  constructor (serviceName) {
     if (!this.isInIframe()) {
       return new Os()
     }
@@ -22,7 +22,7 @@ export default class Sdk {
       writable: false,
     })
 
-    mom = new MomSDK(name)
+    mom = new MomSDK(serviceName)
   }
 
   registerMethod = (methodName, method) => {
@@ -30,9 +30,9 @@ export default class Sdk {
       const { payload } = packet
       try {
         const result = await method(payload)
-        mom.response({ ...packet, payload: { result } })
+        mom.handleResponse({ ...packet, payload: { result } })
       } catch (e) {
-        mom.response({
+        mom.handleresponse({
           ...packet,
           payload: {
             error: true,
@@ -47,12 +47,10 @@ export default class Sdk {
   broadcast = message => sendToParentIframe(new EventPacket(message))
   invoke = packet => mom.invoke({ service: Role.OS, ...packet })
 
-  onRegister = () => {}
-  onLoad = () => {}
-  onUnload = () => {}
-  onOpen = () => {}
-  onUnopen = () => {}
-  onSuspend = () => {}
-  onKill = () => {}
+  onLoadApp = callback => mom.on(BroadcastEvent.LOAD_APP, callback)
+  onOpenApp = callback => mom.on(BroadcastEvent.OPEN_APP, callback)
+  onSuspendApp = callback => mom.on(BroadcastEvent.SUSPEND_APP, callback)
+  onKillApp = callback => mom.on(BroadcastEvent.KILL_APP, callback)
+  onLaunchApp = callback => mom.on(BroadcastEvent.LAUNCH_APP, callback)
   on = (eventName, callback) => mom.on(eventName, callback)
 }

@@ -4,26 +4,12 @@ import {
   TOS_EVENT_PACKET_TYPE,
 } from './tosSymbols'
 import appManager from './AppManager'
+import invokeMap from './utils/invokeMap'
 import moduleManager from './ModuleManager'
 import EventEmitter from './utils/EventEmitter'
 import { INVOKE_TIMEOUT, Role } from './constants'
-import { InvokePacket, ResponsePacket } from './packet'
+import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 import { sendToChildIframe } from './utils/communication'
-
-const invokeMap = new Map()
-
-function delOneInvoke (id) {
-  return invokeMap.delete(id)
-}
-
-function addOneInvoke (packet) {
-  const { id } = packet
-  return invokeMap.set(id, packet)
-}
-
-function getOneInvoke (id) {
-  return invokeMap.get(id)
-}
 
 /**
  * Message-Oriented Middleware
@@ -38,33 +24,46 @@ export default class MomOS extends EventEmitter {
     const invokePacket = new InvokePacket(packet)
     const { service, method } = invokePacket
     const promise = this.genPromise(invokePacket)
-    addOneInvoke({ ...invokePacket, promise })
-
-    const isModule = moduleManager.hasModule(service)
-    const isApp = appManager.hasApp(service)
+    const module = moduleManager.getModule(service)
+    const app = appManager.getApp(service)
     const isOs = service === Role.OS
 
-    if (isModule) {
+    if (module) {
       /* */
-    } else if (isApp) {
-      sendToChildIframe(appManager.getApp(service).iframe, invokePacket)
     } else if (isOs) {
-      this.emit(method, invokePacket)
+      this.sendToSelf(method, invokePacket)
+    } else if (app) {
+      this.sendToApp(app, invokePacket)
     }
+
+    invokeMap.setItem({ ...invokePacket, promise })
 
     return promise
   }
 
-  response = packet => {
-    const { id } = packet
-    const invokePacket = getOneInvoke(id)
-
-    invokePacket.promise.resolve(packet.payload.result)
+  handleResponse = data => {
+    const { id, result } = data
+    const invokePacket = invokeMap.deleteItem(id)
+    invokePacket.promise.resolve(result)
   }
+
+
+  broadcast = message => {
+    const eventPacket = new EventPacket(message)
+
+    appManager
+      .getLoadedApps()
+      .forEach(app => this.sendToApp(app, eventPacket))
+  }
+
+  sendToApp = (app, packet) => sendToChildIframe(app.iframe, packet)
+  sendToModule = (module, packet) => {}
+  sendToSelf = (method, packet) => this.emit(method, packet)
 
   onMessage = async event => {
     const packet = event.data
     const {
+      id,
       type,
       eventName,
       origin,
@@ -83,7 +82,7 @@ export default class MomOS extends EventEmitter {
         break
 
       case TOS_RESPONSE_PACKET_TYPE:
-        this.response(packet)
+        this.handleResponse({ id, result: packet.payload.result })
         break
 
       case TOS_EVENT_PACKET_TYPE:
@@ -103,21 +102,21 @@ export default class MomOS extends EventEmitter {
     const promise = new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         const err = new Error(`tiny-os Invoke Error: Timeout Error, invokeId: ${id}`)
-        delOneInvoke(id)
+        invokeMap.deleteItem(id)
         this.handleGlobalError(err)
         reject(err)
       }, timeout)
 
       _reject = err => {
         clearTimeout(timer)
-        delOneInvoke(id)
+        invokeMap.deleteItem(id)
         this.handleGlobalError(err)
         reject(err)
       }
 
       _resolve = res => {
         clearTimeout(timer)
-        delOneInvoke(id)
+        invokeMap.deleteItem(id)
         resolve(res)
       }
     })
