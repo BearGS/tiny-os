@@ -1,33 +1,13 @@
-// import { TOS } from '../src/'
-// import appData from './appData'
-
-// if (module.hot) {
-//   module.hot.accept()
-// }
-
-// const tos = new TOS()
-// tos.configContainer('app-container')
-// tos.registerAll(appData)
-
-// appData.map(data => data.name)
-//   .forEach(name => {
-//     document.getElementById(`app-${name}`)
-//       .addEventListener('click', () => tos.launchApp(name))
-//   })
-
-// document.getElementById('app-nonapp')
-//   .addEventListener('click', () => tos.launchApp('nonapp'))
-
+// import TOS from '../dist/os.esm'
 import TOS from '../src/os'
-import appData from './appData'
-import configs from './configs'
+import appData from './js/appData'
+import configs from './js/configs'
 
 if (module.hot) {
   module.hot.accept()
 }
 
 const tos = new TOS(configs)
-
 
 // tos.launchApp('order')
 
@@ -53,6 +33,17 @@ document.getElementById('fetch-order-count')
     })
       .then(result => {
         document.getElementById('count').innerHTML = result
+      })
+      .catch(e => window.alert(e.message)) // eslint-disable-line
+  })
+document.getElementById('fetch-goods-count')
+  .addEventListener('click', () => {
+    tos.invoke({
+      service: 'goods',
+      method: 'fetchGoodsCount',
+    })
+      .then(result => {
+        document.getElementById('count-goods').innerHTML = result
       })
       .catch(e => window.alert(e.message)) // eslint-disable-line
   })

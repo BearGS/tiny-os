@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     app: [paths.appIndexJs],
     order: [paths.appOrderJs],
+    goods: [paths.appGoodsJs],
   },
   output: {
     path: paths.appDist,

@@ -4,9 +4,9 @@ import {
   TOS_EVENT_PACKET_TYPE,
 } from './tosSymbols'
 import invokeMap from './utils/invokeMap'
-import { INVOKE_TIMEOUT } from './constants'
 import EventEmitter from './utils/EventEmitter'
-import { InvokePacket, ResponsePacket, EventPacket } from './packet'
+import { INVOKE_TIMEOUT, Role } from './constants'
+import { InvokePacket, ResponsePacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 
 /**
@@ -19,17 +19,21 @@ export default class MomSDK extends EventEmitter {
     this.service = service
   }
 
+  sendToOs = packet => sendToParentIframe(packet)
+  sendToSelf = (method, packet) => this.emit(method, packet)
+
   invoke = packet => {
-    const { method, isCurrent } = packet
+    const { service, method } = packet
     const invokePacket = new InvokePacket({
       ...packet,
       origin: this.service,
+      originType: Role.APP,
     })
     const promise = this.genPromise(invokePacket)
 
     invokeMap.setItem({ ...invokePacket, promise })
 
-    if (isCurrent) {
+    if (service === this.service) {
       this.sendToSelf(method, invokePacket)
     } else {
       this.sendToOs(invokePacket)
@@ -38,8 +42,15 @@ export default class MomSDK extends EventEmitter {
     return promise
   }
 
-  sendToOs = packet => sendToParentIframe(packet)
-  sendToSelf = (method, packet) => this.emit(method, packet)
+  onInvoke = packet => {
+    const { method } = packet
+    const promise = this.genPromise(packet)
+
+    invokeMap.setItem({ ...packet, promise })
+    this.sendToSelf(method, packet)
+
+    return promise
+  }
 
   handleResponse = packet => {
     const { id, payload: { result } } = packet
@@ -54,7 +65,7 @@ export default class MomSDK extends EventEmitter {
     switch (type) {
       case TOS_INVOKE_PACKET_TYPE:
         try {
-          const result = await this.invoke({ ...packet, isCurrent: true })
+          const result = await this.onInvoke(packet)
           this.sendToOs(new ResponsePacket({ ...packet, payload: { result } }))
         } catch (e) { /* do nothing */ }
         break

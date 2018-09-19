@@ -1,4 +1,5 @@
-import SDK from '../src/sdk'
+// import SDK from '../../dist/sdk.esm'
+import SDK from '../../src/sdk'
 
 const sdk = new SDK('order')
 sdk.registerMethod('fetchOrderCount', () => `orderCount: ${Math.round(Math.random() * 100)}`)

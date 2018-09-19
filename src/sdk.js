@@ -27,7 +27,7 @@ export default class Sdk {
         const result = await method(payload)
         mom.handleResponse({ ...packet, payload: { result } })
       } catch (e) {
-        mom.handleresponse({
+        mom.handleResponse({
           ...packet,
           payload: {
             error: true,

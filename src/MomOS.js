@@ -5,17 +5,16 @@ import {
 } from './tosSymbols'
 import appManager from './AppManager'
 import invokeMap from './utils/invokeMap'
+import invariant from './utils/invariant'
 import moduleManager from './ModuleManager'
 import EventEmitter from './utils/EventEmitter'
 import { INVOKE_TIMEOUT, Role } from './constants'
-import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 import { sendToChildIframe } from './utils/communication'
-import invariant from './utils/invariant'
+import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 
 /**
  * Message-Oriented Middleware
  */
-// export default class MomOS extends EventEmitter {
 class MomOS extends EventEmitter {
   constructor () {
     if (typeof MomOS.instance === 'object'
@@ -35,24 +34,40 @@ class MomOS extends EventEmitter {
   }
 
   invoke = packet => {
-    const invokePacket = new InvokePacket(packet)
-    const { service, method } = invokePacket
+    const invokePacket = new InvokePacket({
+      ...packet,
+      originType: Role.OS,
+    })
     const promise = this.genPromise(invokePacket)
+    invokeMap.setItem({ ...invokePacket, promise })
+
+    this.dispatchInvoke(invokePacket)
+
+    return promise
+  }
+
+  onInvoke = packet => {
+    const promise = this.genPromise(packet)
+    invokeMap.setItem({ ...packet, promise })
+
+    this.dispatchInvoke(packet)
+
+    return promise
+  }
+
+  dispatchInvoke = packet => {
+    const { service, method } = packet
     const module = moduleManager.getModule(service)
     const app = appManager.getApp(service)
-    const isMomOS = service === Role.OS
+    const isOS = service === Role.OS
 
     if (module) {
       /* */
-    } else if (isMomOS) {
-      this.sendToSelf(method, invokePacket)
+    } else if (isOS) {
+      this.sendToSelf(method, packet)
     } else if (app) {
-      this.sendToApp(app, invokePacket)
+      this.sendToApp(app, packet)
     }
-
-    invokeMap.setItem({ ...invokePacket, promise })
-
-    return promise
   }
 
   handleResponse = data => {
@@ -95,7 +110,7 @@ class MomOS extends EventEmitter {
     switch (type) {
       case TOS_INVOKE_PACKET_TYPE:
         try {
-          const result = await this.invoke(packet)
+          const result = await this.onInvoke(packet)
           this.sendToApp(
             targetApp,
             new ResponsePacket({ ...packet, payload: { result } }),
