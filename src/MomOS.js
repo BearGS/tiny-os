@@ -10,13 +10,27 @@ import EventEmitter from './utils/EventEmitter'
 import { INVOKE_TIMEOUT, Role } from './constants'
 import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 import { sendToChildIframe } from './utils/communication'
+import invariant from './utils/invariant'
 
 /**
  * Message-Oriented Middleware
  */
-export default class MomOS extends EventEmitter {
+// export default class MomOS extends EventEmitter {
+class MomOS extends EventEmitter {
   constructor () {
+    if (typeof MomOS.instance === 'object'
+      && MomOS.instance instanceof MomOS) {
+      return MomOS.instance
+    }
+
     super()
+
+    Object.defineProperty(MomOS, 'instance', {
+      value: this,
+      configurable: false,
+      writable: false,
+    })
+
     window.addEventListener('message', this.onMessage.bind(this))
   }
 
@@ -26,11 +40,11 @@ export default class MomOS extends EventEmitter {
     const promise = this.genPromise(invokePacket)
     const module = moduleManager.getModule(service)
     const app = appManager.getApp(service)
-    const isOs = service === Role.OS
+    const isMomOS = service === Role.OS
 
     if (module) {
       /* */
-    } else if (isOs) {
+    } else if (isMomOS) {
       this.sendToSelf(method, invokePacket)
     } else if (app) {
       this.sendToApp(app, invokePacket)
@@ -56,7 +70,14 @@ export default class MomOS extends EventEmitter {
       .forEach(app => this.sendToApp(app, eventPacket))
   }
 
-  sendToApp = (app, packet) => sendToChildIframe(app.iframe, packet)
+  sendToApp = (app, packet) => {
+    invariant(
+      app.isUnloadApp,
+      'App is unLoad, can\'t send message ',
+    )
+
+    sendToChildIframe(app.iframe, packet)
+  }
   sendToModule = (module, packet) => {}
   sendToSelf = (method, packet) => this.emit(method, packet)
 
@@ -69,13 +90,14 @@ export default class MomOS extends EventEmitter {
       origin,
     } = packet
 
+    const targetApp = appManager.getApp(origin)
+
     switch (type) {
       case TOS_INVOKE_PACKET_TYPE:
         try {
           const result = await this.invoke(packet)
-
-          sendToChildIframe(
-            appManager.getApp(origin).iframe,
+          this.sendToApp(
+            targetApp,
             new ResponsePacket({ ...packet, payload: { result } }),
           )
         } catch (e) { /* do nothing */ }
@@ -129,4 +151,6 @@ export default class MomOS extends EventEmitter {
 
   handleGlobalError = () => {}
 }
+
+export default new MomOS()
 

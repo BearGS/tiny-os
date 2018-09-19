@@ -29,9 +29,10 @@ if (module.hot) {
 const tos = new TOS(configs)
 
 
-tos.launchApp('order')
+// tos.launchApp('order')
 
 tos.registerMethod('fetchOsCount', () => `osCount: ${Math.round(Math.random() * 100)}`)
+tos.registerMethod('osKsid', () => 'KSID:AG3nmDLI8EHhf8LIe2nSjDAbDF')
 
 appData.map(data => data.name)
   .forEach(name => {

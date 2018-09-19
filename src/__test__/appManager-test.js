@@ -1,5 +1,7 @@
 jest.mock('../Router')
+jest.mock('../MomOS')
 import router from '../__mocks__/Router'
+import mom from '../__mocks__/MomOS'
 import manager from '../AppManager'
 import sleep from '../utils/sleep'
 

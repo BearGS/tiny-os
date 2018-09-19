@@ -1,16 +1,17 @@
 /* eslint-disable no-param-reassign */
+import mom from './MomOS'
 import router from './Router'
 import App, { _apps } from './App'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { OsHandler, MAX_APP } from './constants'
+import { OsHandler, MAX_APP, BroadcastEvent } from './constants'
 import requiredParam from './utils/requiredParam'
 import { checkTypeString } from './utils/checkType'
+import { EventPacket } from './packet'
 
 class AppManager {
   constructor () {
     this.maxAppNum = MAX_APP
-    router.listen(this.onOuterAppChange.bind(this))
   }
 
   register = ({
@@ -51,20 +52,15 @@ class AppManager {
 
   registerAll = apps => apps.forEach(app => this.register(app))
 
-  // outer hash change. for example: click a link with hash
-  onOuterAppChange = ({ hash: appName = '' }) => {
-    if (!appName) return
-
-    const app = this.getApp(appName)
-
-    if (!app) {
-      this.suspendOpendApp()
-    } else {
-      this.launch(app.name)
-    }
-  }
-
   launch = appName => {
+    const alreadyLaunched = this
+      .getFrontendApps()
+      .find(fApp => fApp.name === appName)
+
+    if (alreadyLaunched) {
+      return
+    }
+
     const launchingApp = this.getApp(appName)
     invariant(!launchingApp, `No such App named \`${appName}\``)
 
@@ -73,6 +69,19 @@ class AppManager {
       .load(launchingApp)
       .open(launchingApp)
       .killOverflowApp()
+
+    // mom.broadcast({
+    //   eventName: BroadcastEvent.LAUNCH_APP,
+    //   payload: { appName },
+    // })
+
+    mom.sendToApp(
+      launchingApp,
+      new EventPacket({
+        eventName: BroadcastEvent.LAUNCH_APP,
+        payload: { appName: launchingApp.name },
+      })
+    )
   }
 
   load = loadingApp => {
@@ -94,6 +103,13 @@ class AppManager {
     suspendingApp.toBackend()
     router.render({ ...suspendingApp, handler: OsHandler.SUSPEND })
 
+    mom.sendToApp(
+      suspendingApp,
+      new EventPacket({
+        eventName: BroadcastEvent.SUSPEND_APP,
+        payload: { appName: suspendingApp.name },
+      })
+    )
     return this
   }
 

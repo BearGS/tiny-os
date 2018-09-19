@@ -1,11 +1,12 @@
 // /* eslint-disable no-param-reassign */
-import MomOS from './MomOS'
+// import MomOS from './MomOS'
+import mom from './MomOS'
 import router from './Router'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { BroadcastEvent } from './constants'
 
-let mom
+// let mom
 
 export default class Os {
   constructor (configs) {
@@ -20,16 +21,28 @@ export default class Os {
       writable: false,
     })
 
-    mom = new MomOS()
     this.init(configs)
+
+    router.listen(this.onOuterAppChange.bind(this))
+    // mom = new MomOS()
+    mom.on(BroadcastEvent.LAUNCH_APP, packet => {
+      const { appName } = packet.payload
+      this.launchApp(appName)
+    })
   }
 
-  launchApp = appName => {
-    appManager.launch(appName)
-    mom.broadcast({
-      eventName: BroadcastEvent.LAUNCH_APP,
-      payload: { appName },
-    })
+  launchApp = appName => appManager.launch(appName)
+
+  // outer hash change. for example: click a link with hash
+  onOuterAppChange = ({ hash: appName = '' }) => {
+    if (!appName) return
+    const app = appManager.hasApp(appName)
+
+    if (!app) {
+      appManager.suspendOpendApp()
+    } else {
+      this.launchApp(appName)
+    }
   }
 
   registerApp = app => appManager.register(app)

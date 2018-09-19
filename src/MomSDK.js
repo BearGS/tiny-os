@@ -6,7 +6,7 @@ import {
 import invokeMap from './utils/invokeMap'
 import { INVOKE_TIMEOUT } from './constants'
 import EventEmitter from './utils/EventEmitter'
-import { InvokePacket, ResponsePacket } from './packet'
+import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 
 /**
@@ -30,13 +30,16 @@ export default class MomSDK extends EventEmitter {
     invokeMap.setItem({ ...invokePacket, promise })
 
     if (isCurrent) {
-      this.emit(method, invokePacket)
+      this.sendToSelf(method, invokePacket)
     } else {
-      sendToParentIframe(invokePacket)
+      this.sendToOs(invokePacket)
     }
 
     return promise
   }
+
+  sendToOs = packet => sendToParentIframe(packet)
+  sendToSelf = (method, packet) => this.emit(method, packet)
 
   handleResponse = packet => {
     const { id, payload: { result } } = packet
@@ -46,13 +49,13 @@ export default class MomSDK extends EventEmitter {
 
   onMessage = async event => {
     const packet = event.data
-    const { type, eventName } = packet
+    const { type, eventName, payload } = packet
 
     switch (type) {
       case TOS_INVOKE_PACKET_TYPE:
         try {
           const result = await this.invoke({ ...packet, isCurrent: true })
-          sendToParentIframe(new ResponsePacket({ ...packet, payload: { result } }))
+          this.sendToOs(new ResponsePacket({ ...packet, payload: { result } }))
         } catch (e) { /* do nothing */ }
         break
 
@@ -61,7 +64,7 @@ export default class MomSDK extends EventEmitter {
         break
 
       case TOS_EVENT_PACKET_TYPE:
-        this.emit(eventName, packet.payload)
+        this.emit(eventName, payload)
         break
 
       default:

@@ -1,17 +1,12 @@
-import Os from './os'
+// import Os from './os'
 import MomSDK from './MomSDK'
 import { Role, BroadcastEvent } from './constants'
 import { EventPacket } from './packet'
-import { sendToParentIframe } from './utils/communication'
 
 let mom
 
 export default class Sdk {
   constructor (serviceName) {
-    if (!this.isInIframe()) {
-      return new Os()
-    }
-
     if (typeof Sdk.instance === 'object'
       && Sdk.instance instanceof Sdk) {
       return Sdk.instance
@@ -43,14 +38,18 @@ export default class Sdk {
     })
   }
 
-  isInIframe = () => window.parent !== window
-  broadcast = message => sendToParentIframe(new EventPacket(message))
   invoke = packet => mom.invoke({ service: Role.OS, ...packet })
+
+  launchApp = appName =>
+    mom.sendToOs(new EventPacket({
+      eventName: BroadcastEvent.LAUNCH_APP,
+      payload: { appName }
+    }))
 
   onLoadApp = callback => mom.on(BroadcastEvent.LOAD_APP, callback)
   onOpenApp = callback => mom.on(BroadcastEvent.OPEN_APP, callback)
   onSuspendApp = callback => mom.on(BroadcastEvent.SUSPEND_APP, callback)
   onKillApp = callback => mom.on(BroadcastEvent.KILL_APP, callback)
   onLaunchApp = callback => mom.on(BroadcastEvent.LAUNCH_APP, callback)
-  on = (eventName, callback) => mom.on(eventName, callback)
+  // on = (eventName, callback) => mom.on(eventName, callback)
 }
