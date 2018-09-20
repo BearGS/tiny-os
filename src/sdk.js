@@ -7,6 +7,10 @@ let mom
 
 export default class Sdk {
   constructor (serviceName) {
+    // if (window.parent === window) {
+    //   return new Os()
+    // }
+
     if (typeof Sdk.instance === 'object'
       && Sdk.instance instanceof Sdk) {
       return Sdk.instance
@@ -22,14 +26,14 @@ export default class Sdk {
 
   registerMethod = (methodName, method) => {
     mom.on(methodName, async packet => {
-      const { payload } = packet
+      const { id, payload } = packet
       try {
         const result = await method(payload)
-        mom.handleResponse({ ...packet, payload: { result } })
+        mom.handleResponse({ id, result })
       } catch (e) {
         mom.handleResponse({
-          ...packet,
-          payload: {
+          id,
+          result: {
             error: true,
             errorMessage: e.message,
           }

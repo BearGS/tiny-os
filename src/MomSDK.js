@@ -3,16 +3,16 @@ import {
   TOS_RESPONSE_PACKET_TYPE,
   TOS_EVENT_PACKET_TYPE,
 } from './tosSymbols'
+import Mom from './Mom'
+import { Role } from './constants'
 import invokeMap from './utils/invokeMap'
-import EventEmitter from './utils/EventEmitter'
-import { INVOKE_TIMEOUT, Role } from './constants'
 import { InvokePacket, ResponsePacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 
 /**
  * Message-Oriented Middleware
  */
-export default class MomSDK extends EventEmitter {
+export default class MomSDK extends Mom {
   constructor (service) {
     super()
     window.addEventListener('message', this.onMessage.bind(this))
@@ -20,7 +20,6 @@ export default class MomSDK extends EventEmitter {
   }
 
   sendToOs = packet => sendToParentIframe(packet)
-  sendToSelf = (method, packet) => this.emit(method, packet)
 
   invoke = packet => {
     const { service, method } = packet
@@ -52,15 +51,14 @@ export default class MomSDK extends EventEmitter {
     return promise
   }
 
-  handleResponse = packet => {
-    const { id, payload: { result } } = packet
-    const invokePacket = invokeMap.deleteItem(id)
-    invokePacket.promise.resolve(result)
-  }
-
   onMessage = async event => {
     const packet = event.data
-    const { type, eventName, payload } = packet
+    const {
+      id,
+      type,
+      eventName,
+      payload,
+    } = packet
 
     switch (type) {
       case TOS_INVOKE_PACKET_TYPE:
@@ -71,7 +69,7 @@ export default class MomSDK extends EventEmitter {
         break
 
       case TOS_RESPONSE_PACKET_TYPE:
-        this.handleResponse(packet)
+        this.handleResponse({ id, result: packet.payload.result })
         break
 
       case TOS_EVENT_PACKET_TYPE:
@@ -82,40 +80,5 @@ export default class MomSDK extends EventEmitter {
         /* do nothing */
     }
   }
-
-  genPromise = packet => {
-    let _resolve
-    let _reject
-
-    const { id, timeout = INVOKE_TIMEOUT } = packet
-    const promise = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const err = new Error('timeout error')
-        invokeMap.deleteItem(id)
-        this.handleGlobalError(err)
-        reject(err)
-      }, timeout * 100)
-
-      _reject = err => {
-        clearTimeout(timer)
-        invokeMap.deleteItem(id)
-        this.handleGlobalError(err)
-        reject(err)
-      }
-
-      _resolve = res => {
-        clearTimeout(timer)
-        invokeMap.deleteItem(id)
-        resolve(res)
-      }
-    })
-
-    promise.resolve = _resolve
-    promise.reject = _reject
-
-    return promise
-  }
-
-  handleGlobalError = () => {}
 }
 

@@ -1,6 +1,3 @@
-export default function compose (...fns) {
-  return param => fns.reduce(
-    (result, fn) => fn(result),
-    param
-  )
-}
+const compose = (...fns) => param => fns.reduce((result, fn) => fn(result), param)
+
+export default compose

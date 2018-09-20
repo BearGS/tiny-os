@@ -3,33 +3,21 @@ import {
   TOS_RESPONSE_PACKET_TYPE,
   TOS_EVENT_PACKET_TYPE,
 } from './tosSymbols'
+import Mom from './Mom'
+import { Role } from './constants'
 import appManager from './AppManager'
 import invokeMap from './utils/invokeMap'
 import invariant from './utils/invariant'
 import moduleManager from './ModuleManager'
-import EventEmitter from './utils/EventEmitter'
-import { INVOKE_TIMEOUT, Role } from './constants'
 import { sendToChildIframe } from './utils/communication'
 import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 
 /**
  * Message-Oriented Middleware
  */
-class MomOS extends EventEmitter {
+class MomOS extends Mom {
   constructor () {
-    if (typeof MomOS.instance === 'object'
-      && MomOS.instance instanceof MomOS) {
-      return MomOS.instance
-    }
-
     super()
-
-    Object.defineProperty(MomOS, 'instance', {
-      value: this,
-      configurable: false,
-      writable: false,
-    })
-
     window.addEventListener('message', this.onMessage.bind(this))
   }
 
@@ -70,13 +58,6 @@ class MomOS extends EventEmitter {
     }
   }
 
-  handleResponse = data => {
-    const { id, result } = data
-    const invokePacket = invokeMap.deleteItem(id)
-    invokePacket.promise.resolve(result)
-  }
-
-
   broadcast = message => {
     const eventPacket = new EventPacket(message)
 
@@ -94,7 +75,6 @@ class MomOS extends EventEmitter {
     sendToChildIframe(app.iframe, packet)
   }
   sendToModule = (module, packet) => {}
-  sendToSelf = (method, packet) => this.emit(method, packet)
 
   onMessage = async event => {
     const packet = event.data
@@ -130,41 +110,6 @@ class MomOS extends EventEmitter {
         /* do nothing */
     }
   }
-
-  genPromise = packet => {
-    let _resolve
-    let _reject
-
-    const { id, timeout = INVOKE_TIMEOUT } = packet
-    const promise = new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const err = new Error(`tiny-os Invoke Error: Timeout Error, invokeId: ${id}`)
-        invokeMap.deleteItem(id)
-        this.handleGlobalError(err)
-        reject(err)
-      }, timeout)
-
-      _reject = err => {
-        clearTimeout(timer)
-        invokeMap.deleteItem(id)
-        this.handleGlobalError(err)
-        reject(err)
-      }
-
-      _resolve = res => {
-        clearTimeout(timer)
-        invokeMap.deleteItem(id)
-        resolve(res)
-      }
-    })
-
-    promise.resolve = _resolve
-    promise.reject = _reject
-
-    return promise
-  }
-
-  handleGlobalError = () => {}
 }
 
 export default new MomOS()
