@@ -1,12 +1,12 @@
 // /* eslint-disable no-param-reassign */
 // import MomOS from './MomOS'
-import mom from './MomOS'
+import MomOS from './MomOS'
 import router from './Router'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { BroadcastEvent } from './constants'
 
-// let mom
+let mom
 
 export default class Os {
   constructor (configs) {
@@ -21,14 +21,15 @@ export default class Os {
       writable: false,
     })
 
-    this.init(configs)
-
-    router.listen(this.onOuterAppChange.bind(this))
-    // mom = new MomOS()
+    mom = new MomOS()
+    appManager.configMom(mom)
     mom.on(BroadcastEvent.LAUNCH_APP, packet => {
       const { appName } = packet.payload
       this.launchApp(appName)
     })
+
+    this.init(configs)
+    router.listen(this.onOuterAppChange.bind(this))
   }
 
   launchApp = appName => appManager.launch(appName)

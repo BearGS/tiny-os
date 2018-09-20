@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import mom from './MomOS'
+// import mom from './MomOS'
 import router from './Router'
 import App, { _apps } from './App'
 import invariant from './utils/invariant'
@@ -8,6 +8,10 @@ import { OsHandler, MAX_APP, BroadcastEvent } from './constants'
 import requiredParam from './utils/requiredParam'
 import { checkTypeString } from './utils/checkType'
 import { EventPacket } from './packet'
+
+let mom = {
+  sendToApp () {}
+}
 
 class AppManager {
   constructor () {
@@ -153,6 +157,10 @@ class AppManager {
   getLoadedApps = () => _apps.filter(app => !app.isUnloadApp)
   getBackendApps = () => _apps.filter(app => app.isBackendApp)
   getFrontendApps = () => _apps.filter(app => app.isFrontendApp)
+
+  configMom = momOs => {
+    mom = momOs
+  }
 }
 
 export default new AppManager()

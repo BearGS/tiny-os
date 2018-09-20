@@ -15,9 +15,21 @@ import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 /**
  * Message-Oriented Middleware
  */
-class MomOS extends Mom {
+export default class MomOS extends Mom {
   constructor () {
     super()
+
+    if (typeof MomOS.instance === 'object'
+      && MomOS.instance instanceof MomOS) {
+      return MomOS.instance
+    }
+
+    Object.defineProperty(MomOS, 'instance', {
+      value: this,
+      configurable: false,
+      writable: false,
+    })
+
     window.addEventListener('message', this.onMessage.bind(this))
   }
 
@@ -112,5 +124,5 @@ class MomOS extends Mom {
   }
 }
 
-export default new MomOS()
+// export default new MomOS()
 

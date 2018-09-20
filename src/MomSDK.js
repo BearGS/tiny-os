@@ -15,6 +15,18 @@ import { sendToParentIframe } from './utils/communication'
 export default class MomSDK extends Mom {
   constructor (service) {
     super()
+
+    if (typeof MomSDK.instance === 'object'
+      && MomSDK.instance instanceof MomSDK) {
+      return MomSDK.instance
+    }
+
+    Object.defineProperty(MomSDK, 'instance', {
+      value: this,
+      configurable: false,
+      writable: false,
+    })
+
     window.addEventListener('message', this.onMessage.bind(this))
     this.service = service
   }
