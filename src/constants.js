@@ -39,4 +39,10 @@ export const BroadcastEvent = {
   SUSPEND_APP: 'SUSPEND_APP'
 }
 
+export const PacketType = {
+  TOS_INVOKE_PACKET_TYPE: 'TOS_INVOKE_PACKET_TYPE',
+  TOS_EVENT_PACKET_TYPE: 'TOS_EVENT_PACKET_TYPE',
+  TOS_RESPONSE_PACKET_TYPE: 'TOS_RESPONSE_PACKET_TYPE',
+}
+
 export const INVOKE_TIMEOUT = 10000 // 系统间invoke超时时间

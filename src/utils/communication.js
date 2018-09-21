@@ -3,10 +3,11 @@ export function sendToChildIframes (iframes, msg) {
 }
 
 export function sendToChildIframe (childIframe, msg) {
-  childIframe.contentWindow.postMessage({ ...msg, hhh: 3 }, '*')
+  childIframe.contentWindow.postMessage(msg, '*')
 }
 
-
 export function sendToParentIframe (msg) {
-  window.parent.postMessage(msg, '*')
+  if (window.parent !== window) {
+    window.parent.postMessage(msg, '*')
+  }
 }

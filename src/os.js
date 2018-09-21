@@ -2,14 +2,17 @@
 // import MomOS from './MomOS'
 import MomOS from './MomOS'
 import router from './Router'
+import Kernel from './Kernel'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { BroadcastEvent } from './constants'
 
 let mom
 
-export default class Os {
+export default class Os extends Kernel {
   constructor (configs) {
+    super()
+
     if (typeof Os.instance === 'object'
       && Os.instance instanceof Os) {
       return Os.instance

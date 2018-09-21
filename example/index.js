@@ -47,3 +47,15 @@ document.getElementById('fetch-goods-count')
       })
       .catch(e => window.alert(e.message)) // eslint-disable-line
   })
+
+document.getElementById('fetch-own-count')
+  .addEventListener('click', () => {
+    tos.invoke({
+      service: 'OS',
+      method: 'fetchOsCount',
+    })
+      .then(result => {
+        document.getElementById('count-own').innerHTML = result
+      })
+      .catch(e => window.alert(e.message)) // eslint-disable-line
+  })

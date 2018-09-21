@@ -1,10 +1,5 @@
-import {
-  TOS_INVOKE_PACKET_TYPE,
-  TOS_RESPONSE_PACKET_TYPE,
-  TOS_EVENT_PACKET_TYPE,
-} from './tosSymbols'
 import Mom from './Mom'
-import { Role } from './constants'
+import { Role, PacketType } from './constants'
 import invokeMap from './utils/invokeMap'
 import { InvokePacket, ResponsePacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
@@ -27,8 +22,8 @@ export default class MomSDK extends Mom {
       writable: false,
     })
 
-    window.addEventListener('message', this.onMessage.bind(this))
     this.service = service
+    window.addEventListener('message', this.onMessage.bind(this))
   }
 
   sendToOs = packet => sendToParentIframe(packet)
@@ -73,18 +68,18 @@ export default class MomSDK extends Mom {
     } = packet
 
     switch (type) {
-      case TOS_INVOKE_PACKET_TYPE:
+      case PacketType.TOS_INVOKE_PACKET_TYPE:
         try {
           const result = await this.onInvoke(packet)
           this.sendToOs(new ResponsePacket({ ...packet, payload: { result } }))
         } catch (e) { /* do nothing */ }
         break
 
-      case TOS_RESPONSE_PACKET_TYPE:
+      case PacketType.TOS_RESPONSE_PACKET_TYPE:
         this.handleResponse({ id, result: packet.payload.result })
         break
 
-      case TOS_EVENT_PACKET_TYPE:
+      case PacketType.TOS_EVENT_PACKET_TYPE:
         this.emit(eventName, payload)
         break
 

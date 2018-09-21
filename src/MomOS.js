@@ -1,10 +1,5 @@
-import {
-  TOS_INVOKE_PACKET_TYPE,
-  TOS_RESPONSE_PACKET_TYPE,
-  TOS_EVENT_PACKET_TYPE,
-} from './tosSymbols'
 import Mom from './Mom'
-import { Role } from './constants'
+import { Role, PacketType } from './constants'
 import appManager from './AppManager'
 import invokeMap from './utils/invokeMap'
 import invariant from './utils/invariant'
@@ -29,7 +24,6 @@ export default class MomOS extends Mom {
       configurable: false,
       writable: false,
     })
-
     window.addEventListener('message', this.onMessage.bind(this))
   }
 
@@ -97,10 +91,17 @@ export default class MomOS extends Mom {
       origin,
     } = packet
 
+    const apps = appManager.getApps()
+    const secureOrigins = apps.map(app => app.origin)
+
+    if (!secureOrigins.includes(event.origin)) {
+      return
+    }
+
     const targetApp = appManager.getApp(origin)
 
     switch (type) {
-      case TOS_INVOKE_PACKET_TYPE:
+      case PacketType.TOS_INVOKE_PACKET_TYPE:
         try {
           const result = await this.onInvoke(packet)
           this.sendToApp(
@@ -110,11 +111,13 @@ export default class MomOS extends Mom {
         } catch (e) { /* do nothing */ }
         break
 
-      case TOS_RESPONSE_PACKET_TYPE:
+      case PacketType.TOS_RESPONSE_PACKET_TYPE:
         this.handleResponse({ id, result: packet.payload.result })
         break
 
-      case TOS_EVENT_PACKET_TYPE:
+      case PacketType.TOS_EVENT_PACKET_TYPE:
+        console.log(window.location.host)
+
         this.emit(eventName, packet)
         break
 
@@ -123,6 +126,4 @@ export default class MomOS extends Mom {
     }
   }
 }
-
-// export default new MomOS()
 

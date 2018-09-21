@@ -11,6 +11,10 @@ export default class App {
     this.state = AppState.UNLOAD
     this.priority = priority || AppPriority.TEMPORARY
     this.isWhatApp()
+
+    const element = document.createElement('a')
+    element.href = url
+    this.origin = element.origin
   }
 
   toUnload = () => {

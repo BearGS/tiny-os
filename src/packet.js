@@ -1,12 +1,7 @@
-import {
-  TOS_INVOKE_PACKET_TYPE,
-  TOS_EVENT_PACKET_TYPE,
-  TOS_RESPONSE_PACKET_TYPE
-} from './tosSymbols'
 import uuid from './utils/uuid'
 import { checkType } from './utils/checkType'
 import requiredParam from './utils/requiredParam'
-import { MethodType, ServiceType } from './constants'
+import { MethodType, ServiceType, PacketType } from './constants'
 
 export class InvokePacket {
   constructor ({
@@ -25,7 +20,7 @@ export class InvokePacket {
     this.payload = payload
     this.origin = origin
     this.originType = originType
-    this.type = TOS_INVOKE_PACKET_TYPE
+    this.type = PacketType.TOS_INVOKE_PACKET_TYPE
   }
 }
 
@@ -40,7 +35,7 @@ export class ResponsePacket {
     this.payload = payload
     this.origin = origin
     this.originType = originType
-    this.type = TOS_RESPONSE_PACKET_TYPE
+    this.type = PacketType.TOS_RESPONSE_PACKET_TYPE
   }
 }
 
@@ -52,6 +47,6 @@ export class EventPacket {
     this.id = uuid()
     this.payload = payload
     this.eventName = eventName
-    this.type = TOS_EVENT_PACKET_TYPE
+    this.type = PacketType.TOS_EVENT_PACKET_TYPE
   }
 }
