@@ -116,8 +116,6 @@ export default class MomOS extends Mom {
         break
 
       case PacketType.TOS_EVENT_PACKET_TYPE:
-        console.log(window.location.host)
-
         this.emit(eventName, packet)
         break
 

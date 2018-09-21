@@ -57,8 +57,6 @@ class AppManager {
   registerAll = apps => apps.forEach(app => this.register(app))
 
   launch = appName => {
-    const a = window.location.host
-    console.log(a)
     const alreadyLaunched = this
       .getFrontendApps()
       .find(fApp => fApp.name === appName)
