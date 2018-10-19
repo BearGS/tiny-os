@@ -9,6 +9,7 @@ export default class Mom extends EventEmitter {
   handleResponse = data => {
     const { id, result } = data
     const invokePacket = invokeMap.deleteItem(id)
+
     invokePacket.promise.resolve(result)
   }
 

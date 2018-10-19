@@ -65,17 +65,31 @@ export default class MomSDK extends Mom {
       type,
       eventName,
       payload,
+      origin,
+      // service
     } = packet
 
     switch (type) {
       case PacketType.TOS_INVOKE_PACKET_TYPE:
         try {
+          if (origin !== Role.OS) {
+            return
+          }
           const result = await this.onInvoke(packet)
-          this.sendToOs(new ResponsePacket({ ...packet, payload: { result } }))
+          this.sendToOs(new ResponsePacket({
+            ...packet,
+            origin: this.service,
+            originType: Role.APP,
+            service: Role.OS,
+            payload: { result },
+          }))
         } catch (e) { /* do nothing */ }
         break
 
       case PacketType.TOS_RESPONSE_PACKET_TYPE:
+        if (origin !== Role.OS) {
+          return
+        }
         this.handleResponse({ id, result: packet.payload.result })
         break
 

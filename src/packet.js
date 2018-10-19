@@ -27,12 +27,14 @@ export class InvokePacket {
 export class ResponsePacket {
   constructor ({
     id,
+    service,
     origin,
     originType,
     payload = {},
   } = {}) {
     this.id = id
     this.payload = payload
+    this.service = service
     this.origin = origin
     this.originType = originType
     this.type = PacketType.TOS_RESPONSE_PACKET_TYPE

@@ -30,7 +30,7 @@ document.getElementById('fetch-order-count')
       .then(result => {
         document.getElementById('count').innerHTML = result
       })
-      .catch(e => window.alert(e.message)) // eslint-disable-line
+      .catch(e => console.log(e.message)) // eslint-disable-line
   })
 
 document.getElementById('fetch-goods-own-os-count')

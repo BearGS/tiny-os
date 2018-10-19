@@ -31,6 +31,7 @@ export default class MomOS extends Mom {
     const invokePacket = new InvokePacket({
       ...packet,
       originType: Role.OS,
+      origin: Role.OS,
     })
     const promise = this.genPromise(invokePacket)
     invokeMap.setItem({ ...invokePacket, promise })
@@ -44,7 +45,11 @@ export default class MomOS extends Mom {
     const promise = this.genPromise(packet)
     invokeMap.setItem({ ...packet, promise })
 
-    this.dispatchInvoke(packet)
+    this.dispatchInvoke({
+      ...packet,
+      origin: Role.OS,
+      originType: Role.OS,
+    })
 
     return promise
   }
@@ -89,6 +94,7 @@ export default class MomOS extends Mom {
       type,
       eventName,
       origin,
+      originType,
     } = packet
 
     const apps = appManager.getApps()
@@ -98,20 +104,28 @@ export default class MomOS extends Mom {
       return
     }
 
-    const targetApp = appManager.getApp(origin)
-
     switch (type) {
       case PacketType.TOS_INVOKE_PACKET_TYPE:
         try {
           const result = await this.onInvoke(packet)
+          const targetApp = appManager.getApp(origin)
           this.sendToApp(
             targetApp,
-            new ResponsePacket({ ...packet, payload: { result } }),
+            new ResponsePacket({
+              ...packet,
+              origin: Role.OS,
+              originType: Role.OS,
+              service: origin,
+              payload: { result },
+            }),
           )
         } catch (e) { /* do nothing */ }
         break
 
       case PacketType.TOS_RESPONSE_PACKET_TYPE:
+        if (originType !== Role.APP && originType !== Role.MODULE) {
+          return
+        }
         this.handleResponse({ id, result: packet.payload.result })
         break
 

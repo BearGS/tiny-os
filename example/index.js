@@ -1,5 +1,6 @@
 // import TOS from '../dist/os.esm'
 import TOS from '../src/os'
+import SDK from '../src/sdk'
 import appData from './js/appData'
 import configs from './js/configs'
 
@@ -8,7 +9,8 @@ if (module.hot) {
 }
 
 const tos = new TOS(configs)
-
+const sdk = new SDK('jhh')
+console.log('sdk', sdk) // eslint-disable-line
 // tos.launchApp('order')
 
 tos.registerMethod('fetchOsCount', () => `osCount: ${Math.round(Math.random() * 100)}`)
