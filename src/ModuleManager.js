@@ -13,6 +13,11 @@ class ModuleManager {
     checkTypeString(name)
 
     invariant(
+      name === '',
+      'param `name` must not be empty string'
+    )
+
+    invariant(
       this.getModule(name),
       `you've already register another module named \`${name}\``,
     )

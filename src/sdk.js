@@ -1,4 +1,3 @@
-// import Os from './os'
 import Kernel from './Kernel'
 import MomSDK from './MomSDK'
 import { Role, BroadcastEvent } from './constants'
@@ -8,9 +7,6 @@ let mom
 
 export default class Sdk extends Kernel {
   constructor (serviceNameOrConfigs) {
-    // if (window.parent === window) {
-    //   return new Os(serviceNameOrConfigs)
-    // }
     super()
 
     if (typeof Sdk.instance === 'object'

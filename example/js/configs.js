@@ -17,7 +17,7 @@ export default {
     },
     {
       name: 'carts',
-      url: 'http://localhost:8686/carts.html',
+      url: 'http://localhost:8686/:shopId/carts.html?shopId=:shopId',
       priority: 'temporary',
     },
     {
@@ -32,5 +32,9 @@ export default {
     }
   ],
   maxAppNum: 3,
-  container: 'app-container'
+  container: 'app-container',
+  methods: {},
+  values: {
+    shopId: '150009412'
+  }
 }

@@ -1,37 +1,20 @@
 // /* eslint-disable no-param-reassign */
-// import MomOS from './MomOS'
-import MomOS from './MomOS'
+import mom from './MomOS'
 import router from './Router'
 import Kernel from './Kernel'
+import Storage from './utils/storage'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { BroadcastEvent } from './constants'
 
-let mom
-
-export default class Os extends Kernel {
+class Os extends Kernel {
   constructor (configs) {
     super()
-
-    if (typeof Os.instance === 'object'
-      && Os.instance instanceof Os) {
-      return Os.instance
-    }
-
-    Object.defineProperty(Os, 'instance', {
-      value: this,
-      configurable: false,
-      writable: false,
-    })
-
-    mom = new MomOS()
-    appManager.configMom(mom)
+    // appManager.configMom(mom)
     mom.on(BroadcastEvent.LAUNCH_APP, packet => {
       const { appName } = packet.payload
       this.launchApp(appName)
     })
-
-    this.init(configs)
     router.listen(this.onOuterAppChange.bind(this))
   }
 
@@ -60,8 +43,12 @@ export default class Os extends Kernel {
     modules = [],
     container,
     maxAppNum,
+    methods = {},
+    values = {},
     // expiredTime = EXPIRED_TIME,
   } = {}) => {
+    Object.keys(methods).forEach(key => this.registerMethod(key, methods[key]))
+    Object.keys(values).forEach(key => this.registerValue(key, values[key]))
     router.configContainer(container)
     appManager.configMaxAppNum(maxAppNum)
     appManager.registerAll(apps)
@@ -73,8 +60,13 @@ export default class Os extends Kernel {
   registerMethod = (methodName, method) => {
     mom.on(methodName, async packet => {
       const { id, payload } = packet
+      let result
       try {
-        const result = await method(payload)
+        if (typeof method === 'function') {
+          result = await method(payload)
+        } else {
+          result = await method
+        }
         mom.handleResponse({ id, result })
       } catch (e) {
         mom.handleResponse({
@@ -87,5 +79,9 @@ export default class Os extends Kernel {
       }
     })
   }
+
+  registerValue = (key, value) => Storage.setItem(key, value)
+  deleteValue = key => Storage.deleteItem(key)
 }
 
+export default new Os()

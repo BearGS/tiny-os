@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-// import mom from './MomOS'
+import mom from './MomOS'
 import router from './Router'
 import App, { _apps } from './App'
 import invariant from './utils/invariant'
@@ -9,9 +9,9 @@ import requiredParam from './utils/requiredParam'
 import { checkTypeString } from './utils/checkType'
 import { EventPacket } from './packet'
 
-let mom = {
-  sendToApp () {}
-}
+// let mom = {
+//   sendToApp () {}
+// }
 
 class AppManager {
   constructor () {
@@ -43,6 +43,10 @@ class AppManager {
 
     const registeringApp = new App({ name, url, priority })
     _apps.unshift(registeringApp)
+  }
+
+  registerAll = apps => {
+    apps.forEach(app => this.register(app))
 
     const appName = window.location.hash.slice(1)
     if (appName) {
@@ -53,8 +57,6 @@ class AppManager {
       }
     }
   }
-
-  registerAll = apps => apps.forEach(app => this.register(app))
 
   launch = appName => {
     const alreadyLaunched = this
@@ -73,11 +75,6 @@ class AppManager {
       .load(launchingApp)
       .open(launchingApp)
       .killOverflowApp()
-
-    // mom.broadcast({
-    //   eventName: BroadcastEvent.LAUNCH_APP,
-    //   payload: { appName },
-    // })
 
     mom.sendToApp(
       launchingApp,
@@ -158,9 +155,9 @@ class AppManager {
   getBackendApps = () => _apps.filter(app => app.isBackendApp)
   getFrontendApps = () => _apps.filter(app => app.isFrontendApp)
 
-  configMom = momOs => {
-    mom = momOs
-  }
+  // configMom = momOs => {
+  // mom = momOs
+  // }
 }
 
 export default new AppManager()

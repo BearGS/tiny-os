@@ -1,6 +1,6 @@
-// import TOS from '../dist/os.esm'
-import TOS from '../src/os'
+// import tos from '../dist/os.esm'
 import SDK from '../src/sdk'
+import tos from '../src/os'
 import appData from './js/appData'
 import configs from './js/configs'
 
@@ -8,13 +8,19 @@ if (module.hot) {
   module.hot.accept()
 }
 
-const tos = new TOS(configs)
-const sdk = new SDK('jhh')
-console.log('sdk', sdk) // eslint-disable-line
+tos.init(configs)
+
 // tos.launchApp('order')
 
 tos.registerMethod('fetchOsCount', () => `osCount: ${Math.round(Math.random() * 100)}`)
 tos.registerMethod('osKsid', () => 'KSID:AG3nmDLI8EHhf8LIe2nSjDAbDF')
+tos.registerMethod('osKsid2', 'KSID2:AG3nmDLI8EHhf8LIe2nSjDAbDF')
+tos.registerValue('shopId', '150009413')
+
+const sdk = new SDK('TEST-UNUSEFUL-SDK')
+sdk.registerMethod('fetchOsCount', () => `TEST-UNUSEFUL-SDK: ${Math.round(Math.random() * 100)}`)
+sdk.registerMethod('osKsid', () => 'TEST-UNUSEFUL-SDK:AG3nmDLI8EHhf8LIe2nSjDAbDF')
+sdk.registerMethod('osKsid2', 'TEST-UNUSEFUL-SDK:AG3nmDLI8EHhf8LIe2nSjDAbDF')
 
 appData.map(data => data.name)
   .forEach(name => {

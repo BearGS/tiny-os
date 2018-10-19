@@ -52,6 +52,18 @@ document.getElementById('fetch-os-ksid')
       .catch(e => window.alert(e.message)) // eslint-disable-line
   })
 
+document.getElementById('fetch-os-ksid2')
+  .addEventListener('click', () => {
+    sdk.invoke({
+      service: 'OS',
+      method: 'osKsid2',
+    })
+      .then(result => {
+        document.getElementById('os-ksid2').innerHTML = result
+      })
+      .catch(e => window.alert(e.message)) // eslint-disable-line
+  })
+
 document.getElementById('launch-app')
   .addEventListener('click', () => sdk.launchApp('goods'))
 

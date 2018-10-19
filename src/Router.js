@@ -1,3 +1,4 @@
+import Storage from './utils/storage'
 import { OsHandler } from './constants'
 import invariant from './utils/invariant'
 import { _apps as routerMap } from './App'
@@ -48,7 +49,17 @@ class Router {
 
   loadIframe = app => {
     if (!app.iframe) {
-      const iframe = createIframe(this.container, app.name, app.url)
+      const result = app.url.match(/:[a-zA-Z]\w*/g) || []
+      const params = result.map(item => item.slice(1))
+
+      const value = params.map(item => Storage.getItem(item))
+
+      const url = result.reduce(
+        (res, item, index) => res.replace(item, value[index]),
+        app.url
+      )
+
+      const iframe = createIframe(this.container, app.name, url)
       app.iframe = iframe // eslint-disable-line
     }
   }

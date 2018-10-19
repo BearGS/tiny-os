@@ -1,22 +1,17 @@
 // import SDK from '../../dist/sdk.esm'
 import SDK from '../../src/sdk'
-import OS from '../../src/os'
+import os from '../../src/os'
 
 const sdk = new SDK('goods')
-const os = new OS()
-const os2 = new OS()
+
 os.registerMethod('fetchGoodsOwnOsCount', () => `goodsOwnOsCount: ${Math.round(Math.random() * 100)}`)
-
 sdk.registerMethod('fetchGoodsCount', () => `goodsCount: ${Math.round(Math.random() * 100)}`)
-
 sdk.onLaunchApp(data => {
   console.log('goods app: launchApp ====== ', data) // eslint-disable-line
 })
-
 sdk.onLoadApp(data => {
   console.log('goods app: loadApp ====== ', data) // eslint-disable-line
 })
-
 sdk.onSuspendApp(data => {
   console.log('goods app: suspendApp ====== ', data) // eslint-disable-line
 })
@@ -35,7 +30,7 @@ document.getElementById('fetch-order-count')
 
 document.getElementById('fetch-goods-own-os-count')
   .addEventListener('click', () => {
-    os2.invoke({
+    os.invoke({
       service: 'OS',
       method: 'fetchGoodsOwnOsCount',
     })
