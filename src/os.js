@@ -6,19 +6,17 @@ import Storage from './utils/storage'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
 import { BroadcastEvent } from './constants'
+import { checkTypeString } from './utils/checkType'
 
 class Os extends Kernel {
-  constructor (configs) {
+  constructor () {
     super()
-    // appManager.configMom(mom)
-    mom.on(BroadcastEvent.LAUNCH_APP, packet => {
-      const { appName } = packet.payload
-      this.launchApp(appName)
-    })
+
+    mom.on(BroadcastEvent.LAUNCH_APP, packet =>
+      this.launchApp(packet.payload.appName))
+
     router.listen(this.onOuterAppChange.bind(this))
   }
-
-  launchApp = appName => appManager.launch(appName)
 
   // outer hash change. for example: click a link with hash
   onOuterAppChange = ({ hash: appName = '' }) => {
@@ -32,10 +30,14 @@ class Os extends Kernel {
     }
   }
 
-  registerApp = app => appManager.register(app)
-  registerAll = apps => appManager.registerAll(apps)
+  invoke = packet => mom.invoke(packet)
   use = module => moduleManager.use(module)
+  deleteValue = key => Storage.deleteItem(key)
+  registerApp = app => appManager.register(app)
   useAll = modules => moduleManager.useAll(modules)
+  launchApp = appName => appManager.launch(appName)
+  registerAll = apps => appManager.registerAll(apps)
+  registerValue = (key, value) => Storage.setItem(key, value)
   configContainer = container => router.configContainer(container)
 
   init = ({
@@ -55,12 +57,13 @@ class Os extends Kernel {
     moduleManager.useAll(modules)
   }
 
-  invoke = packet => mom.invoke(packet)
-
   registerMethod = (methodName, method) => {
+    checkTypeString(methodName)
+
     mom.on(methodName, async packet => {
       const { id, payload } = packet
       let result
+
       try {
         if (typeof method === 'function') {
           result = await method(payload)
@@ -79,9 +82,6 @@ class Os extends Kernel {
       }
     })
   }
-
-  registerValue = (key, value) => Storage.setItem(key, value)
-  deleteValue = key => Storage.deleteItem(key)
 }
 
 export default new Os()

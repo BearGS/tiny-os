@@ -14,13 +14,13 @@ tos.init(configs)
 
 tos.registerMethod('fetchOsCount', () => `osCount: ${Math.round(Math.random() * 100)}`)
 tos.registerMethod('osKsid', () => 'KSID:AG3nmDLI8EHhf8LIe2nSjDAbDF')
-tos.registerMethod('osKsid2', 'KSID2:AG3nmDLI8EHhf8LIe2nSjDAbDF')
+tos.registerMethod('osKsid2', () => 'KSID2:AG3nmDLI8EHhf8LIe2nSjDAbDF')
 tos.registerValue('shopId', '150009413')
 
 const sdk = new SDK('TEST-UNUSEFUL-SDK')
 sdk.registerMethod('fetchOsCount', () => `TEST-UNUSEFUL-SDK: ${Math.round(Math.random() * 100)}`)
 sdk.registerMethod('osKsid', () => 'TEST-UNUSEFUL-SDK:AG3nmDLI8EHhf8LIe2nSjDAbDF')
-sdk.registerMethod('osKsid2', 'TEST-UNUSEFUL-SDK:AG3nmDLI8EHhf8LIe2nSjDAbDF')
+sdk.registerMethod('osKsid2', () => 'TEST-UNUSEFUL-SDK2:AG3nmDLI8EHhf8LIe2nSjDAbDF')
 
 appData.map(data => data.name)
   .forEach(name => {

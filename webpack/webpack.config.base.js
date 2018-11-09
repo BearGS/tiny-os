@@ -51,6 +51,7 @@ module.exports = {
               plugins: [
                 'transform-runtime',
                 'transform-decorators-legacy',
+                'transform-class-properties',
                 'react-hot-loader/babel',
               ],
               cacheDirectory: true,

@@ -66,7 +66,6 @@ export default class MomSDK extends Mom {
       eventName,
       payload,
       origin,
-      // service
     } = packet
 
     switch (type) {
