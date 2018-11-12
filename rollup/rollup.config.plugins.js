@@ -14,6 +14,7 @@ module.exports = {
     }),
     replace({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+      __DEV__: process.env.NODE_ENV !== 'production' ? true : false,
     }),
     resolve(),
     commonjs({
