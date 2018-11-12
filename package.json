@@ -2,8 +2,8 @@
   "name": "tiny-os",
   "version": "0.0.1",
   "description": "a tool",
-  "main": "dist/tiny-os.umd.min.js",
-  "module": "dist/tiny-os.esm.js",
+  "main": "dist/tos.umd.js",
+  "module": "dist/tos.esm.js",
   "scripts": {
     "test": "NODE_ENV=test jest",
     "build": "NODE_ENV=production rimraf dist & node scripts/rollup/index.js",

@@ -1,6 +1,6 @@
 import Mom from './Mom'
-import { Role, PacketType } from './constants'
 import invokeMap from './utils/invokeMap'
+import { Role, PacketType } from './constants'
 import { InvokePacket, ResponsePacket } from './packet'
 import { sendToParentIframe } from './utils/communication'
 

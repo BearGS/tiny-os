@@ -2,16 +2,12 @@
 import mom from './MomOS'
 import router from './Router'
 import App, { _apps } from './App'
+import { EventPacket } from './packet'
 import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
-import { OsHandler, MAX_APP, BroadcastEvent } from './constants'
 import requiredParam from './utils/requiredParam'
 import { checkTypeString } from './utils/checkType'
-import { EventPacket } from './packet'
-
-// let mom = {
-//   sendToApp () {}
-// }
+import { OsHandler, MAX_APP, BroadcastEvent } from './constants'
 
 class AppManager {
   constructor () {
@@ -111,6 +107,7 @@ class AppManager {
         payload: { appName: suspendingApp.name },
       })
     )
+
     return this
   }
 
@@ -122,16 +119,15 @@ class AppManager {
   }
 
   suspendOpendApp = () => {
-    _apps
-      .filter(app => app.isFrontendApp)
+    this
+      .getFrontendApps()
       .forEach(app => this.suspend(app))
 
     return this
   }
 
   killOverflowApp = () => {
-    const backendApp = _apps
-      .filter(app => app.isBackendApp)
+    const backendApp = this.getBackendApps()
 
     if (backendApp.length >= this.maxAppNum) {
       const killingApp = backendApp.pop()
@@ -148,16 +144,13 @@ class AppManager {
   }
 
   getApps = () => _apps
+  getSecureOrigins = () => _apps.map(app => app.origin)
   getApp = appName => _apps.find(app => app.name === appName)
   hasApp = appName => _apps.some(app => app.name === appName)
   getUnloadApps = () => _apps.filter(app => app.isUnloadApp)
   getLoadedApps = () => _apps.filter(app => !app.isUnloadApp)
   getBackendApps = () => _apps.filter(app => app.isBackendApp)
   getFrontendApps = () => _apps.filter(app => app.isFrontendApp)
-
-  // configMom = momOs => {
-  // mom = momOs
-  // }
 }
 
 export default new AppManager()

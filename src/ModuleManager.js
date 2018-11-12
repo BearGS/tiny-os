@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
-import Module, { _modules } from './Module'
 import invariant from './utils/invariant'
-import { checkTypeString } from './utils/checkType'
+import Module, { _modules } from './Module'
 import requiredParam from './utils/requiredParam'
+import { checkTypeString } from './utils/checkType'
 // import compose from './utils/compose'
 
 class ModuleManager {

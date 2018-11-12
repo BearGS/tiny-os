@@ -5,6 +5,7 @@ const paths = require('../config/paths')
 const { name, version, author } =  require(paths.appPackageJson)
 
 const entries = {
+  'tos': 'src/index.js',
   'os': 'src/os.js',
   'sdk': 'src/sdk.js',
 }

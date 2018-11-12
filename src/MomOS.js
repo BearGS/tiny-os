@@ -1,9 +1,9 @@
 import Mom from './Mom'
-import { Role, PacketType } from './constants'
 import appManager from './AppManager'
 import invokeMap from './utils/invokeMap'
 import invariant from './utils/invariant'
 import moduleManager from './ModuleManager'
+import { Role, PacketType } from './constants'
 import { sendToChildIframe } from './utils/communication'
 import { InvokePacket, ResponsePacket, EventPacket } from './packet'
 
@@ -78,7 +78,12 @@ class MomOS extends Mom {
   sendToModule = (module, packet) => {}
 
   onMessage = async event => {
-    const packet = event.data
+    const { data: packet, origin: hostOrigin } = event
+
+    if (!appManager.getSecureOrigins().includes(hostOrigin)) {
+      return
+    }
+
     const {
       id,
       type,
@@ -86,13 +91,6 @@ class MomOS extends Mom {
       origin,
       originType,
     } = packet
-
-    const apps = appManager.getApps()
-    const secureOrigins = apps.map(app => app.origin)
-
-    if (!secureOrigins.includes(event.origin)) {
-      return
-    }
 
     switch (type) {
       case PacketType.TOS_INVOKE_PACKET_TYPE:
