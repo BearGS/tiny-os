@@ -30,6 +30,7 @@ class Os extends Kernel {
     }
   }
 
+  initialed = false
   invoke = packet => mom.invoke(packet)
   use = module => moduleManager.use(module)
   deleteValue = key => Storage.deleteItem(key)
@@ -49,6 +50,11 @@ class Os extends Kernel {
     values = {},
     // expiredTime = EXPIRED_TIME,
   } = {}) => {
+    if (this.initialed) {
+      return
+    }
+    this.initialed = true
+
     Object.keys(methods).forEach(key => this.registerMethod(key, methods[key]))
     Object.keys(values).forEach(key => this.registerValue(key, values[key]))
     router.configContainer(container)

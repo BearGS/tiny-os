@@ -9,6 +9,7 @@ if (module.hot) {
 }
 
 tos.init(configs)
+tos.init(configs)
 
 // tos.launchApp('order')
 
