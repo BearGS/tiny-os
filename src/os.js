@@ -8,12 +8,18 @@ import moduleManager from './ModuleManager'
 import { HandleAppEvent, OsStateModifyEvent } from './constants'
 import { checkTypeString } from './utils/checkType'
 
+let CURRENT_APP_NAME
+
 class Os extends Kernel {
   constructor () {
     super()
 
     mom.on(HandleAppEvent.LAUNCH_APP, packet =>
       this.launchApp(packet.payload.appName))
+
+    mom.on(OsStateModifyEvent.APP_CHANGE, ({ appName }) => {
+      CURRENT_APP_NAME = appName
+    })
 
     router.listen(this.onOuterAppChange.bind(this))
   }
@@ -40,6 +46,7 @@ class Os extends Kernel {
   registerAll = apps => appManager.registerAll(apps)
   registerValue = (key, value) => Storage.setItem(key, value)
   configContainer = container => router.configContainer(container)
+  currentAppName = () => CURRENT_APP_NAME
 
   init = ({
     apps = [],
