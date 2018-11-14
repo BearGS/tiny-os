@@ -88,6 +88,12 @@ class Os extends Kernel {
       }
     })
   }
+
+  onLoadApp = callback => mom.on(BroadcastEvent.LOAD_APP, callback)
+  onOpenApp = callback => mom.on(BroadcastEvent.OPEN_APP, callback)
+  onSuspendApp = callback => mom.on(BroadcastEvent.SUSPEND_APP, callback)
+  onKillApp = callback => mom.on(BroadcastEvent.KILL_APP, callback)
+  onLaunchApp = callback => mom.on(BroadcastEvent.LAUNCH_APP, callback)
 }
 
 export default new Os()

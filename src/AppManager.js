@@ -79,6 +79,10 @@ class AppManager {
         payload: { appName: launchingApp.name },
       })
     )
+    mom.emit(
+      BroadcastEvent.LAUNCH_APP,
+      launchingApp.name,
+    )
   }
 
   load = loadingApp => {
