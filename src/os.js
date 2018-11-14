@@ -5,14 +5,14 @@ import Kernel from './Kernel'
 import Storage from './utils/storage'
 import appManager from './AppManager'
 import moduleManager from './ModuleManager'
-import { BroadcastEvent } from './constants'
+import { HandleAppEvent, OsStateModifyEvent } from './constants'
 import { checkTypeString } from './utils/checkType'
 
 class Os extends Kernel {
   constructor () {
     super()
 
-    mom.on(BroadcastEvent.LAUNCH_APP, packet =>
+    mom.on(HandleAppEvent.LAUNCH_APP, packet =>
       this.launchApp(packet.payload.appName))
 
     router.listen(this.onOuterAppChange.bind(this))
@@ -89,11 +89,7 @@ class Os extends Kernel {
     })
   }
 
-  onLoadApp = callback => mom.on(BroadcastEvent.LOAD_APP, callback)
-  onOpenApp = callback => mom.on(BroadcastEvent.OPEN_APP, callback)
-  onSuspendApp = callback => mom.on(BroadcastEvent.SUSPEND_APP, callback)
-  onKillApp = callback => mom.on(BroadcastEvent.KILL_APP, callback)
-  onLaunchApp = callback => mom.on(BroadcastEvent.LAUNCH_APP, callback)
+  onLaunchApp = callback => mom.on(OsStateModifyEvent.APP_CHANGE, callback)
 }
 
 export default new Os()

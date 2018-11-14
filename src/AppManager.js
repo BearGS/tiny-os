@@ -7,7 +7,7 @@ import invariant from './utils/invariant'
 import sortAppByLRU from './utils/sortAppByLRU'
 import requiredParam from './utils/requiredParam'
 import { checkTypeString } from './utils/checkType'
-import { OsHandler, MAX_APP, BroadcastEvent } from './constants'
+import { OsHandler, MAX_APP, HandleAppEvent, OsStateModifyEvent } from './constants'
 
 class AppManager {
   constructor () {
@@ -75,13 +75,13 @@ class AppManager {
     mom.sendToApp(
       launchingApp,
       new EventPacket({
-        eventName: BroadcastEvent.LAUNCH_APP,
+        eventName: HandleAppEvent.LAUNCH_APP,
         payload: { appName: launchingApp.name },
       })
     )
     mom.emit(
-      BroadcastEvent.LAUNCH_APP,
-      launchingApp.name,
+      OsStateModifyEvent.APP_CHANGE,
+      { appName: launchingApp.name },
     )
   }
 
@@ -107,7 +107,7 @@ class AppManager {
     mom.sendToApp(
       suspendingApp,
       new EventPacket({
-        eventName: BroadcastEvent.SUSPEND_APP,
+        eventName: HandleAppEvent.SUSPEND_APP,
         payload: { appName: suspendingApp.name },
       })
     )
