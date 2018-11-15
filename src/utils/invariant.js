@@ -1,6 +1,6 @@
 let validateFormat = () => {}
 
-if (__DEV__) {
+if (__DEV__) { // eslint-disable-line
   validateFormat = format => {
     if (format === undefined) {
       throw new Error('invariant requires an error message argument')

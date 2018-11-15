@@ -33,32 +33,59 @@ module.exports = {
         include: paths.appSrc,
       },
       {
-        oneOf: [
-          {
-            test: /\.(js|mjs)$/,
-            include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-              presets: [
-                ['env', {
-                  targets: {
-                    browsers: ['chrome > 50', 'ios > 6', 'android > 4.4'],
-                  },
-                  modules: false,
-                }],
-                'stage-2',
-              ],
-              plugins: [
-                'transform-runtime',
-                'transform-decorators-legacy',
-                'transform-class-properties',
-                'react-hot-loader/babel',
-              ],
-              cacheDirectory: true,
-            },
-          },
-        ],
+        test: /\.(js|mjs)$/,
+        include: paths.appSrc,
+        use: {
+          loader: require.resolve('babel-loader'),
+          // options: {
+          //   babelrc: false,
+          //   presets: [
+          //     [
+          //       '@babel/preset-env',
+          //       {
+          //         useBuiltIns: 'usage',
+          //         targets: {
+          //           chrome: '40',
+          //           ios: '8',
+          //           android: '4.4'
+          //         },
+          //         modules: false
+          //       }
+          //     ]
+          //   ],
+          //   plugins: [
+          //     '@babel/plugin-transform-runtime',
+          //     '@babel/plugin-proposal-class-properties',
+          //     ['@babel/plugin-proposal-decorators', { legacy: true }],
+          //     'react-hot-loader/babel',
+          //   ],
+          //   cacheDirectory: false,
+          // },
+        }
       },
     ],
   },
 }
+
+
+// {
+//   "presets": [
+//     [
+//       "@babel/preset-env",
+//       {
+//         "useBuiltIns": "usage",
+//         "targets": {
+//           "chrome": "40",
+//           "ios": "8",
+//           "android": "4.4"
+//         },
+//         "modules": false
+//       }
+//     ]
+//   ],
+//   "plugins": [
+//     "@babel/plugin-transform-runtime",
+//     "@babel/plugin-proposal-class-properties",
+//     ["@babel/plugin-proposal-decorators", { "legacy": true }],
+//   ]
+// }

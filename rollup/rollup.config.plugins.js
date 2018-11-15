@@ -23,27 +23,27 @@ module.exports = {
     eslint({
       include: ['src/**/*.js']
     }),
-    babel({      
-      "ignore": [
-        "node_modules/**"
-      ],
-      "env": {
-        "presets": [
-          ["env", {
+    babel({
+      babelrc: false,
+      exclude: 'node_modules/**',
+      presets: [
+        [
+          "@babel/preset-env",
+          {
+            "useBuiltIns": "usage",
             "targets": {
-              "browsers": ["chrome > 50", "ios > 6", "android > 4.4"]
+              "chrome": "50",
+              "ios": "10",
             },
-            "modules": false
-          }],
-          "stage-2"
+            "modules": false,
+          },
         ],
-      },
-      "plugins": [
-        "external-helpers",
-        "transform-class-properties",
-        "transform-object-rest-spread",
-        "transform-decorators-legacy",
-      ]
+      ],
+      plugins: [
+        "@babel/plugin-transform-runtime",
+        "@babel/plugin-proposal-class-properties",
+      ],
+      runtimeHelpers: true,
     }),
     uglify(
       {
